@@ -22,15 +22,17 @@ import PersonalSearch from "./pages/phonora/PersonalSearch";
 import MapSearch from "./pages/phonora/MapSearch";
 import CompanyTrace from "./pages/B2B/companyTrace";
 import GMail from "./pages/B2B/GMail";
+import Homepage from "./pages/homepage";
 export default function App() {
   return (
     <>
       <Router>
         <ScrollToTop />
-        <Routes>
+        <Routes >
+          <Route path="/" element={<Homepage />} />
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+            <Route index path="/home" element={<Home />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />

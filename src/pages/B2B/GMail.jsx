@@ -68,12 +68,12 @@ export function GMail() {
 
   // Style dégradé
   const gradientStyle = { background: "linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)" };
-
+  //const gradientStyle = { background: "linear-gradient(135deg, #b24592 0%, #f15f79 100%)" };
 
   return (
 
 
-    <div className="mt-12 mb-8 flex flex-col gap-8">
+    <div className="mt-2 mb-2 flex flex-col gap-8">
       
       {/* Formulaire pour saisir les données */}
       <ComponentCard

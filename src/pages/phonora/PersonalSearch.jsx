@@ -314,11 +314,11 @@ export function PersonalSearch() {
   const gradientStyle = { background: "linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)" };
   
   return (
-    <div className="mt-12 mb-8 flex flex-col gap-12">
+    <div className="mt-2 mb-2  flex flex-col gap-10">
       <ComponentCard 
        title={
         <div className="flex flex-col items-center justify-center mb-4 mt-4">
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-3">
           {/* Logo de la marque */}
           <div className="p-3 rounded-lg shadow-lg mr-4" style={gradientStyle}>
          

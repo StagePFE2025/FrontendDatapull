@@ -59,7 +59,9 @@ export function CompanyTrace() {
   //const gradientStyle = { background: "linear-gradient(135deg, #b24592 0%, #f15f79 100%)" };
   const gradientStyle = { background: "linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)" };
   return (
-    <div className="mt-8 mb-8 flex flex-col gap-8">
+    <div className="mt-2 mb-2 flex flex-col gap-8">
+          
+
       {/* En-tête avec logo et titre côte à côte */}
   
       

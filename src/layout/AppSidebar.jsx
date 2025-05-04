@@ -34,7 +34,7 @@ const navItems = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    subItems: [{ name: "Ecommerce", path: "/home", pro: false }],
   },
   {
     icon: <PhoneIcon />,
@@ -342,10 +342,13 @@ const AppSidebar = () => {
             variant="h1"
             className="flex items-center gap-2 transition duration-300 font-semibold text-xxl group"
           >
-            <CircleStackIcon
-              className="h-12 w-12 text-red-500 transition-transform duration-300 group-hover:rotate-6"
-              style={{ color: "rgb(244, 84, 92)" }}
-            />
+            <div className="text-red-500 mr-2" style={{ color: "rgb(244, 84, 92)" }}>
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <rect width="40" height="8" rx="4" fill="currentColor" />
+                <rect y="16" width="40" height="8" rx="4" fill="currentColor" />
+                <rect y="32" width="40" height="8" rx="4" fill="currentColor" />
+              </svg>
+            </div>
             {isExpanded || isHovered || isMobileOpen ? (
               <span className="transition-all duration-300 group-hover:scale-105 ">
                 <span
@@ -354,7 +357,8 @@ const AppSidebar = () => {
                 >
                   Data
                 </span>
-                <span className="text-gray-700 font-semibold group-hover:text-gray-900 text-lg dark:text-gray-200">
+                <span className="text-gray-700 font-semibold group-hover:text-gray-900 text-lg dark:text-gray-200"
+                  style={{ fontSize: "2.5rem"  }}>
                   Pull
                 </span>
 

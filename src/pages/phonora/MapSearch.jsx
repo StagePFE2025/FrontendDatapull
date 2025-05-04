@@ -441,7 +441,7 @@ export function MapSearch() {
   }, []);
   
   return (
-    <div className="mt-12 mb-8 flex flex-col gap-12">
+    <div className="mt-2 mb-2 flex flex-col gap-12">
       
       <ComponentCard 
         title={
@@ -553,9 +553,7 @@ export function MapSearch() {
                   className="absolute top-2 right-2 z-[1000] flex items-center cursor-pointer"
                   onClick={() => setShowLayerGuide(false)}
                 >
-                  <div className="bg-white text-blue-gray-800 px-3 py-2 rounded-lg shadow-lg text-sm font-medium mr-2">
-                    Click to switch layers
-                  </div>
+                  
                   <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[12px] border-l-blue-gray-800 border-b-[8px] border-b-transparent"></div>
                 </div>
               )}
@@ -632,9 +630,10 @@ export function MapSearch() {
         </CardHeader>
         <CardBody className=" px-0 pt-0 pb-2">
           {results.length > 0 ? (
+             <div className="overflow-x-auto">
             <table className="search-results-table w-full min-w-[640px] table-auto">
               <thead>
-                <tr>
+                <tr className="bg-gray-100 dark:bg-gray-800">
                   {["Users", "Gender","Location", "Department","Region", "Phone Number", "Email", "Workplace", "Relationship Status", "Home Location"].map((el) => (
                     <th key={el} className="py-3 px-5 text-left">
                       <Typography variant="small" className="text-[11px] font-bold text-gray-700 dark:text-gray-300">
@@ -648,6 +647,7 @@ export function MapSearch() {
                 {displayedResults}
               </tbody>
             </table>
+            </div>
           ) : (
             !isLoading && (
               <div className="text-center py-4">
