@@ -347,16 +347,17 @@ const AppSidebar = () => {
               style={{ color: "rgb(244, 84, 92)" }}
             />
             {isExpanded || isHovered || isMobileOpen ? (
-              <span className="transition-all duration-300 group-hover:scale-105">
+              <span className="transition-all duration-300 group-hover:scale-105 ">
                 <span
-                  className="font-bold group-hover:text-red-500"
-                  style={{ color: "rgb(244, 84, 92)" }}
+                  className="font-bold group-hover:text-red-500 text-lg "
+                  style={{ color: "rgb(244, 84, 92)", fontSize: "2.5rem" }}
                 >
                   Data
                 </span>
-                <span className="text-gray-700 font-semibold group-hover:text-gray-900">
+                <span className="text-gray-700 font-semibold group-hover:text-gray-900 text-lg dark:text-gray-200">
                   Pull
                 </span>
+
                 <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700 group-hover:bg-red-200">
                   Beta
                 </span>

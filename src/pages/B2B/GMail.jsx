@@ -74,29 +74,31 @@ export function GMail() {
 
 
     <div className="mt-12 mb-8 flex flex-col gap-8">
-      <div className="flex flex-col items-center justify-center mb-4">
-        <div className="flex items-center mb-4">
-          {/* Logo de la marque - maintenant avec une icône de fantôme */}
-          <div className="p-3 rounded-lg shadow-lg mr-4" style={gradientStyle}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-            </svg>
+      
+      {/* Formulaire pour saisir les données */}
+      <ComponentCard
+        title={      <div className="flex flex-col items-center justify-center mb-4">
+          <div className="flex items-center mb-4">
+            {/* Logo de la marque - maintenant avec une icône de fantôme */}
+            <div className="p-3 rounded-lg shadow-lg mr-4" style={gradientStyle}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+              </svg>
+            </div>
+            
+            {/* Titre de l'application */}
+            <div>
+              <label className="font-bold mb-0 text-gray-800 dark:text-gray-200" style={{fontSize: "3rem"}}>
+                Ghost<span className="text-cyan-600"> Mail</span> Hunter
+              </label>
+            </div>
           </div>
           
-          {/* Titre de l'application */}
-          <div>
-            <Label variant="h2" className="font-bold mb-0" color="blue-gray">
-              Ghost<span className="text-cyan-600"> Mail</span> Hunter
-            </Label>
-          </div>
-        </div>
-        
-        <Label variant="lead" color="blue-gray" className="text-center max-lg opacity-80">
-          Uncover hidden professional emails that no one else can find
-        </Label>
-      </div>
-      {/* Formulaire pour saisir les données */}
-      <ComponentCard className="border border-blue-gray-100 shadow-md">
+          <label className="text-center max-lg opacity-80 text-gray-800 dark:text-gray-200" style={{fontSize: "1rem"}}>
+            Uncover hidden professional emails that no one else can find
+          </label>
+        </div>} 
+        className="border border-blue-gray-100 shadow-md">
         <CardHeader 
           variant="gradient" 
           className="mb-4 p-6"
@@ -136,7 +138,7 @@ export function GMail() {
                 placeholder="Nom"
                 color="cyan"
                 required
-                icon={
+                icon= {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -239,8 +241,10 @@ export function GMail() {
             </div>
           ) : (
             <div className="text-center py-16">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+              <svg xmlns="http://www.w3.org/2000/svg" 
+              className="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" 
+                strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
               </svg>
               <Label color="blue-gray" className="font-medium mb-2">
                 No Ghost Emails Discovered Yet

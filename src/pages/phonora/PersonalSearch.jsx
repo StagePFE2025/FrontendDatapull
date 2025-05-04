@@ -4,7 +4,6 @@ import {
   CardBody,
   Typography,
   Button,
-
   Option,
   CardFooter,
 } from "@material-tailwind/react";
@@ -14,6 +13,7 @@ import './UserSearchApp.css';
 import Input from "../../components/form/input/InputField";
 import Select from "../../components/form/Select";
 import Switch from "../../components/form/switch/Switch";
+import ComponentCard from "../../components/common/ComponentCard";
 
 // Reused ProtectedData component - memoized for better performance
 const ProtectedData = memo(({ dataId, type }) => {
@@ -64,7 +64,7 @@ const ProtectedData = memo(({ dataId, type }) => {
   return (
     <span 
       onClick={handleToggleReveal} 
-      className={`protected-data cursor-pointer transition-all duration-300 hover:bg-blue-gray-50 px-2 py-1 rounded ${isLoading ? 'opacity-50' : ''}`}
+      className={`protected-data cursor-pointer transition-all duration-300 hover:bg-blue-gray-50 dark:hover:bg-blue-gray-800 px-2 py-1 rounded ${isLoading ? 'opacity-50' : ''}`}
     >
       {isRevealed && data ? data : getPlaceholder()}
     </span>
@@ -228,69 +228,68 @@ export function PersonalSearch() {
 
   const displayedResults = useMemo(() => {
     return results.map((user, index) => (
-      <tr key={user.idS || index}>
-        <td className="py-3 px-5">
+      <tr key={user.idS || index} className="border-b border-gray-50 dark:border-gray-800">
+        <td className="py-3 px-5 ">
           <div className="flex items-center gap-4">
             <div>
-              <Typography variant="small" color="blue-gray" className="font-semibold">
+              <Typography variant="small" className="font-semibold text-black dark:text-white">
                 {user.firstName} {user.lastName}
               </Typography>
-              
             </div>
           </div>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-normal text-blue-gray-500">
-                {user.gender === 'male' ? 'Male' : user.gender === 'female' ? 'Female' : user.gender}
-            </Typography>
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
+            {user.gender === 'male' ? 'Male' : user.gender === 'female' ? 'Female' : user.gender}
+          </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.currentCity}
           </Typography>
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             {user.currentCountry}
           </Typography>
         </td>
         
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.currentDepartment}
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.currentRegion}
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             <ProtectedData dataId={user.idS} type="phone" />
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             <ProtectedData dataId={user.idS} type="email" />
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.workplace || "Not specified"}
           </Typography>
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             {user.jobTitle || ""}
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             <ProtectedData dataId={user.idS} type="relationship" />
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.hometownCity}
           </Typography>
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             {user.hometownCountry}
           </Typography>
         </td>
@@ -312,21 +311,48 @@ export function PersonalSearch() {
     return pages;
   }, [currentPage, totalPages]);
 
-  //const gradientStyle = { background: "linear-gradient(135deg, #b24592 0%, #f15f79 100%)" };
   const gradientStyle = { background: "linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)" };
+  
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
-      <Card>
+      <ComponentCard 
+       title={
+        <div className="flex flex-col items-center justify-center mb-4 mt-4">
+        <div className="flex items-center mb-4">
+          {/* Logo de la marque */}
+          <div className="p-3 rounded-lg shadow-lg mr-4" style={gradientStyle}>
+         
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-10 w-10 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+
+
+        </div>
+          
+          {/* Titre de l'application */}
+          <div>
+            <label className="font-bold mb-0 text-gray-800 dark:text-gray-200" color="blue-gray" style={{ fontSize: "3rem" }}>
+              Personal<span className="text-red-400"> Search</span>
+            </label>
+          </div>
+        </div>
+        
+        <label className="text-center max-w-lg opacity-80 text-gray-800 dark:text-gray-200" style={{ fontSize: "1rem" }}>
+        Quickly find valid emails from any company
+        </label>
+      </div>
+      }
+      className="bg-white dark:bg-gray-900 shadow-md">
         <CardHeader className="mb-8 p-6" style={gradientStyle}>
-          <Typography variant="h5" color="white">
+          <Typography variant="h5" color="white" className="">
             Personal Search 
           </Typography>
         </CardHeader>
-        <CardBody className="overflow-x-scroll px-6 pt-2 pb-6">
+        <CardBody className="px-6 pt-2 pb-6">
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="flex flex-col">
-                <Typography variant="small" className="mb-2 font-medium">
+                <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                   First Name
                 </Typography>
                 <Input
@@ -335,12 +361,12 @@ export function PersonalSearch() {
                   value={searchParams.firstName}
                   onChange={handleInputChange}
                   placeholder="First Name"
-                  //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                  className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                   labelProps={{ className: "before:content-none after:content-none" }}
                 />
               </div>
               <div className="flex flex-col">
-                <Typography variant="small" className="mb-2 font-medium">
+                <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                   Last Name
                 </Typography>
                 <Input
@@ -349,12 +375,12 @@ export function PersonalSearch() {
                   value={searchParams.lastName}
                   onChange={handleInputChange}
                   placeholder="Last Name"
-                  //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                  className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                   labelProps={{ className: "before:content-none after:content-none" }}
                 />
               </div>
               <div className="flex flex-col">
-                <Typography variant="small" className="mb-2 font-medium">
+                <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                   City
                 </Typography>
                 <Input
@@ -363,12 +389,12 @@ export function PersonalSearch() {
                   value={searchParams.currentCity}
                   onChange={handleInputChange}
                   placeholder="City"
-                  //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                  className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                   labelProps={{ className: "before:content-none after:content-none" }}
                 />
               </div>
               <div className="flex flex-col">
-                <Typography variant="small" className="mb-2 font-medium">
+                <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                   Gender
                 </Typography>
                 <Select
@@ -377,33 +403,32 @@ export function PersonalSearch() {
                   onChange={(value) => handleSelectChange(value, "gender")} 
                   placeholder="All"
                   options={optionsG}
+                  className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                 />
-                  
               </div>
             </div>
 
             {/* Search Type Toggle */}
             <div className="flex items-center gap-3 mb-4 mt-2">
-              <Typography variant="small" color="blue-gray" className="font-medium">
+              <Typography variant="small" className="font-medium text-gray-800 dark:text-gray-200">
                 Search Type:
               </Typography>
               <div className="flex items-center gap-2">
-                <Typography variant="small" color="blue-gray">Exact</Typography>
+                <Typography variant="small" className="text-gray-800 dark:text-gray-200">Exact</Typography>
                 <Switch
                   checked={useFuzzySearch}
                   onChange={handleFuzzyToggle}
                   color="purple"
                   className="h-full w-full checked:bg-gradient-to-r checked:from-purple-500 checked:to-pink-500"
                 />
-                <Typography variant="small" color="blue-gray">Fuzzy</Typography>
+                <Typography variant="small" className="text-gray-800 dark:text-gray-200">Fuzzy</Typography>
               </div>
             </div>
 
             <div className="mb-4">
               <Button
                 variant="text"
-                color="blue-gray"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-gray-800 dark:text-gray-200"
                 onClick={() => setShowAdvanced(!showAdvanced)}
               >
                 {showAdvanced ? 'Hide advanced search' : 'Show advanced search'}
@@ -423,7 +448,7 @@ export function PersonalSearch() {
             {showAdvanced && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Department
                   </Typography>
                   <Input
@@ -432,12 +457,12 @@ export function PersonalSearch() {
                     value={searchParams.currentDepartment}
                     onChange={handleInputChange}
                     placeholder="Department"
-                    //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                     labelProps={{ className: "before:content-none after:content-none" }}
                   />
                 </div>
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Relationship Status
                   </Typography>
                   <Select
@@ -446,11 +471,11 @@ export function PersonalSearch() {
                     onChange={(value) => handleSelectChange(value, "relationshipStatus")}
                     placeholder="All"
                     options={optionsR}
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                   />
-                   
                 </div>
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Workplace
                   </Typography>
                   <Input
@@ -459,12 +484,12 @@ export function PersonalSearch() {
                     value={searchParams.workplace}
                     onChange={handleInputChange}
                     placeholder="Workplace"
-                    //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                     labelProps={{ className: "before:content-none after:content-none" }}
                   />
                 </div>
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Email
                   </Typography>
                   <Input
@@ -473,12 +498,12 @@ export function PersonalSearch() {
                     value={searchParams.email}
                     onChange={handleInputChange}
                     placeholder="Email"
-                    //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                     labelProps={{ className: "before:content-none after:content-none" }}
                   />
                 </div>
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Phone Number
                   </Typography>
                   <Input
@@ -487,12 +512,12 @@ export function PersonalSearch() {
                     value={searchParams.phoneNumber}
                     onChange={handleInputChange}
                     placeholder="Phone Number"
-                    //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                     labelProps={{ className: "before:content-none after:content-none" }}
                   />
                 </div>
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Hometown Country
                   </Typography>
                   <Input
@@ -501,12 +526,12 @@ export function PersonalSearch() {
                     value={searchParams.hometownCountry}
                     onChange={handleInputChange}
                     placeholder="Hometown Country"
-                    //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                     labelProps={{ className: "before:content-none after:content-none" }}
                   />
                 </div>
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Hometown City
                   </Typography>
                   <Input
@@ -515,12 +540,12 @@ export function PersonalSearch() {
                     value={searchParams.hometownCity}
                     onChange={handleInputChange}
                     placeholder="Hometown City"
-                    //className="!border-t-blue-gray-200 focus:!border-t-gray-900"
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                     labelProps={{ className: "before:content-none after:content-none" }}
                   />
                 </div>
                 <div className="flex flex-col">
-                  <Typography variant="small" className="mb-2 font-medium">
+                  <Typography variant="small" className="mb-2 font-medium text-gray-800 dark:text-gray-200">
                     Results per page
                   </Typography>
                   <Select
@@ -531,8 +556,8 @@ export function PersonalSearch() {
                       setCurrentPage(0);
                     }}
                     options={optionsP}
+                    className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
                   />
-                    
                 </div>
               </div>
             )}
@@ -547,7 +572,14 @@ export function PersonalSearch() {
               >
                 {isLoading ? "Searching..." : "Search"}
               </Button>
-              <Button type="button" variant="outlined" color="red" onClick={clearSearch}>
+              <Button 
+                type="button" 
+                variant="outlined" 
+                color="red" 
+                onClick={clearSearch}
+                className="dark:border-red-400 dark:text-red-400"
+                
+              >
                 Clear
               </Button>
             </div>
@@ -555,9 +587,9 @@ export function PersonalSearch() {
             {error && <div className="text-red-500 mt-4">{error}</div>}
           </form>
         </CardBody>
-      </Card>
+      </ComponentCard>
 
-      <Card>
+      <ComponentCard className="bg-white dark:bg-gray-900 shadow-md">
         <CardHeader className="mb-8 p-6" style={gradientStyle}>
           <div className="flex justify-between items-center">
             <Typography variant="h5" color="white">
@@ -573,38 +605,40 @@ export function PersonalSearch() {
             </div>
           </div>
         </CardHeader>
-        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+        <CardBody className="px-0 pt-0 pb-2">
           {results.length > 0 ? (
-            <table className="search-results-table w-full min-w-[640px] table-auto">
-              <thead>
-                <tr>
-                  {["Users","Gender", "Location", "Department","Region", "Phone Number", "Email", "Workplace", "Relationship Status", "Home Location"].map((el) => (
-                    <th key={el} className="py-3 px-5 text-left">
-                      <Typography variant="small" className="text-[11px] font-bold uppercase text-white">
-                        {el}
-                      </Typography>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {displayedResults}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="search-results-table w-full min-w-[640px] table-auto">
+                <thead>
+                  <tr className="bg-gray-100 dark:bg-gray-800">
+                    {["Users","Gender", "Location", "Department","Region", "Phone Number", "Email", "Workplace", "Relationship Status", "Home Location"].map((el) => (
+                      <th key={el} className="py-3 px-5 text-left">
+                        <Typography variant="small" className="text-[11px] font-bold uppercase text-gray-700 dark:text-gray-300">
+                          {el}
+                        </Typography>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-900">
+                  {displayedResults}
+                </tbody>
+              </table>
+            </div>
           ) : (
             !isLoading && (
               <div className="text-center py-4">
-                <Typography color="blue-gray">No results found.</Typography>
+                <Typography className="text-gray-800 dark:text-gray-200">No results found.</Typography>
               </div>
             )
           )}
           {isLoading && (
             <div className="text-center py-4">
-              <Typography color="blue-gray">Loading the results...</Typography>
+              <Typography className="text-gray-800 dark:text-gray-200">Loading the results...</Typography>
             </div>
           )}
         </CardBody>
-        <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+        <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 dark:border-blue-gray-800 p-4">
           <div className="flex items-center gap-2">
             <Button
               onClick={goToPreviousPage}
@@ -622,7 +656,7 @@ export function PersonalSearch() {
                   variant={currentPage === page ? "filled" : "outlined"}
                   color={currentPage === page ? "red" : "gray"}
                   size="sm"
-                  className="pagination-button"
+                  className="pagination-button text-gray-800 dark:text-gray-200"
                   onClick={() => goToPage(page)}
                   disabled={isLoading}
                 >
@@ -640,11 +674,11 @@ export function PersonalSearch() {
               Next
             </Button>
           </div>
-          <Typography variant="small" color="blue-gray" className="font-medium">
+          <Typography variant="small" className="font-medium text-gray-800 dark:text-gray-200">
             Page {currentPage + 1} of {totalPages}
           </Typography>
         </CardFooter>
-      </Card>
+      </ComponentCard>
     </div>
   );
 }

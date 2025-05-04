@@ -62,22 +62,16 @@
   
   border-collapse: separate;
   border-spacing: 0;
-  background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 15px;
   overflow: hidden;
 }
 
-.search-results-table thead {
-  background: linear-gradient(135deg, #f15f79 0%, #b24592 100%);
-  color: #fff;
-  
-}
+
 
 .search-results-table th {
  
   text-align: left;
-  
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -86,9 +80,7 @@
   transition: background-color 0.2s ease;
 }
 
-.search-results-table tbody tr:hover {
-  background-color: #f8fafc; /* Couleur de survol */
-}
+
 
 .search-results-table td {
   color: #374151;

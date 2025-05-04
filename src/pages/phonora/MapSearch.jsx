@@ -358,69 +358,68 @@ export function MapSearch() {
 
   const displayedResults = useMemo(() => {
     return results.map((user, index) => (
-      <tr key={user.idS || index}>
-        <td className="py-3 px-5">
+      <tr key={user.idS || index} className="border-b border-gray-50 dark:border-gray-800">
+        <td className="py-3 px-5 ">
           <div className="flex items-center gap-4">
             <div>
-              <Typography variant="small" color="blue-gray" className="font-semibold">
+              <Typography variant="small" className="font-semibold text-black dark:text-white">
                 {user.firstName} {user.lastName}
               </Typography>
-              
             </div>
           </div>
         </td>
         <td className="py-3 px-5">
-        <Typography className="text-xs font-normal text-blue-gray-500">
-                {user.gender === 'male' ? 'Male' : user.gender === 'female' ? 'Female' : user.gender}
-              </Typography>
-          
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
+            {user.gender === 'male' ? 'Male' : user.gender === 'female' ? 'Female' : user.gender}
+          </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.currentCity}
           </Typography>
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             {user.currentCountry}
           </Typography>
         </td>
+        
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.currentDepartment}
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.currentRegion}
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             <ProtectedData dataId={user.idS} type="phone" />
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             <ProtectedData dataId={user.idS} type="email" />
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.workplace || "Not specified"}
           </Typography>
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             {user.jobTitle || ""}
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             <ProtectedData dataId={user.idS} type="relationship" />
           </Typography>
         </td>
         <td className="py-3 px-5">
-          <Typography className="text-xs font-semibold text-blue-gray-600">
+          <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.hometownCity}
           </Typography>
-          <Typography className="text-xs font-normal text-blue-gray-500">
+          <Typography className="text-xs font-normal text-blue-gray-500 dark:text-gray-100">
             {user.hometownCountry}
           </Typography>
         </td>
@@ -443,13 +442,39 @@ export function MapSearch() {
   
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
-      <ComponentCard>
+      
+      <ComponentCard 
+        title={
+        <div className="flex flex-col items-center justify-center mb-4 mt-4">
+        <div className="flex items-center mb-4">
+          {/* Logo de la marque */}
+          <div className="p-3 rounded-lg shadow-lg mr-4" style={gradientStyle}>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-10 w-10 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
+          </svg>
+
+        </div>
+          
+          {/* Titre de l'application */}
+          <div>
+            <label className="font-bold mb-0 text-gray-800 dark:text-gray-200" color="blue-gray" style={{ fontSize: "3rem" }}>
+              Map<span className="text-red-400"> Search</span>
+            </label>
+          </div>
+        </div>
+        
+        <label className="text-center max-w-lg opacity-80 text-gray-800 dark:text-gray-200" style={{ fontSize: "1rem" }}>
+        Quickly find valid emails from any company
+        </label>
+      </div>
+      }
+      >
         <CardHeader className="mb-8 p-6" style={gradientStyle}>
           <Typography variant="h5" color="white">
             Map Search 
           </Typography>
         </CardHeader>
-        <CardBody className="overflow-x-scroll px-6 pt-2 pb-6">
+        <CardBody className="px-6 pt-2 pb-6">
           <div className="mb-6">
             <Label variant="h6" className="mb-4">
               Search by Location and Gender
@@ -605,38 +630,38 @@ export function MapSearch() {
             </div>
           </div>
         </CardHeader>
-        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+        <CardBody className=" px-0 pt-0 pb-2">
           {results.length > 0 ? (
             <table className="search-results-table w-full min-w-[640px] table-auto">
               <thead>
                 <tr>
                   {["Users", "Gender","Location", "Department","Region", "Phone Number", "Email", "Workplace", "Relationship Status", "Home Location"].map((el) => (
                     <th key={el} className="py-3 px-5 text-left">
-                      <Typography variant="small" className="text-[11px] font-bold ">
+                      <Typography variant="small" className="text-[11px] font-bold text-gray-700 dark:text-gray-300">
                         {el}
                       </Typography>
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody bg-white dark:bg-gray-900>
                 {displayedResults}
               </tbody>
             </table>
           ) : (
             !isLoading && (
               <div className="text-center py-4">
-                <Label color="blue-gray">No results found.</Label>
+                <Typography className="text-gray-800 dark:text-gray-200">No results found.</Typography>
               </div>
             )
           )}
           {isLoading && (
             <div className="text-center py-4">
-              <Label color="blue-gray">Loading the results...</Label>
+              <Typography className="text-gray-800 dark:text-gray-200">Loading the results...</Typography>
             </div>
           )}
         </CardBody>
-        <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+        <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 dark:border-blue-gray-800 p-4">
           <div className="flex items-center gap-2">
             <Button
               onClick={goToPreviousPage}
@@ -654,7 +679,7 @@ export function MapSearch() {
                   variant={currentPage === page ? "filled" : "outlined"}
                   color={currentPage === page ? "red" : "gray"}
                   size="sm"
-                  className="pagination-button"
+                  className="pagination-button text-gray-800 dark:text-gray-200"
                   onClick={() => goToPage(page)}
                   disabled={isLoading}
                 >
@@ -672,9 +697,9 @@ export function MapSearch() {
               Next
             </Button>
           </div>
-          <Label variant="small" color="blue-gray" className="font-medium">
-            Page {currentPage + 1} of {totalPages}
-          </Label>
+           <Typography variant="small" className="font-medium text-gray-800 dark:text-gray-200">
+                      Page {currentPage + 1} of {totalPages}
+            </Typography>
         </CardFooter>
       </ComponentCard>
     </div>

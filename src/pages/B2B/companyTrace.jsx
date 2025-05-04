@@ -62,31 +62,33 @@ export function CompanyTrace() {
     <div className="mt-8 mb-8 flex flex-col gap-8">
       {/* En-tête avec logo et titre côte à côte */}
   
-      <div className="flex flex-col items-center justify-center mb-4 mt-4">
-        <div className="flex items-center mb-4">
-          {/* Logo de la marque */}
-          <div className="p-3 rounded-lg shadow-lg mr-4" style={gradientStyle}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          
-          {/* Titre de l'application */}
-          <div>
-            <Label variant="h2" className="font-bold mb-0" color="blue-gray">
-              Company<span className="text-red-400">Trace</span>
-            </Label>
-          </div>
-        </div>
-        
-        <Label variant="lead" color="blue-gray" className="text-center max-w-lg opacity-80">
-        Quickly find valid emails from any company
-        </Label>
-      </div>
+      
      
 
       {/* Formulaire pour saisir le domaine */}
-      <ComponentCard className="border border-blue-gray-100 shadow-md">
+      <ComponentCard
+        title={<div className="flex flex-col items-center justify-center mb-4 mt-4">
+          <div className="flex items-center mb-4">
+            {/* Logo de la marque */}
+            <div className="p-3 rounded-lg shadow-lg mr-4" style={gradientStyle}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            
+            {/* Titre de l'application */}
+            <div>
+              <label className="font-bold mb-0 text-gray-800 dark:text-gray-200" color="blue-gray" style={{ fontSize: "3rem" }}>
+                Company<span className="text-red-400">Trace</span>
+              </label>
+            </div>
+          </div>
+          
+          <label className="text-center max-w-lg opacity-80 text-gray-800 dark:text-gray-200" style={{ fontSize: "1rem" }}>
+          Quickly find valid emails from any company
+          </label>
+        </div>} 
+        className="border border-blue-gray-100 shadow-md">
         <CardHeader 
           variant="gradient" 
           className="mb-4 p-6"
@@ -111,7 +113,7 @@ export function CompanyTrace() {
               required
               size="lg"
               icon={
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                 </svg>
               }
@@ -193,8 +195,10 @@ export function CompanyTrace() {
             </div>
           ) : (
             <div className="text-center py-16">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-red-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <svg xmlns="http://www.w3.org/2000/svg" 
+              className="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" 
+                strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <Label color="blue-gray" className="font-medium mb-2 text-blue-gray-500">
               No valid email founds yet.
