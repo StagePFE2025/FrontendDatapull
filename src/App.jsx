@@ -23,6 +23,7 @@ import MapSearch from "./pages/phonora/MapSearch";
 import CompanyTrace from "./pages/B2B/companyTrace";
 import GMail from "./pages/B2B/GMail";
 import Homepage from "./pages/homepage";
+import SearchStatistics from "./pages/phonora/SearchStatistics";
 export default function App() {
   return (
     <>
@@ -33,6 +34,7 @@ export default function App() {
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
             <Route index path="/home" element={<Home />} />
+            <Route path="/SearchStatistics" element={<SearchStatistics />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
@@ -68,6 +70,7 @@ export default function App() {
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+
 
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />

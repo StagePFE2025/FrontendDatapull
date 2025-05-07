@@ -1,10 +1,12 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect} from 'react';
 import { Search, Map, FlaskConical, Building, ChevronRight, BarChart2, Users, Mail, Globe, Check,ChevronLeft } from 'lucide-react';
 import dashboardImage from '../../public/images/brand/image.png';
+import { useNavigate } from "react-router-dom";
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('features');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  
+  const navigate = useNavigate();
+
   // Animation for scroll
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
@@ -15,60 +17,66 @@ export default function HomePage() {
 
   const gradientStyle = { background: "linear-gradient(135deg, #b24592 0%, #f15f79 100%)" };
 
-  const carouselSlides = [
+  const carouselData  = [
     {
       id: 1,
-      image: "../../public/images/brand/image.png", // Remplacer par vos images réelles
-      title: "Ghost Mail Hunter",
-      description: "Découvrez des emails professionnels cachés que personne d'autre ne peut trouver."
+      image: "../../public/images/brand/image.png",
+      title: "Trouvez des emails professionnels en quelques clics",
+      description: "DataPull vous aide à découvrir des adresses email valides pour vos prospections B2B et votre développement commercial.",
+      demoUrl: "/personal-search"
     },
     {
       id: 2,
-      image: "/api/placeholder/640/360",
-      title: "Personal Search",
-      description: "Trouvez rapidement des contacts en recherchant par nom, prénom et autres critères personnalisés."
+      image: "../../public/images/brand/image.png",
+      title: "Enrichissez votre base de données de contacts",
+      description: "Identifiez les décideurs clés et connectez-vous directement avec eux pour développer votre réseau professionnel.",
+      demoUrl: "/personal-search"
     },
     {
       id: 3,
-      image: "/api/placeholder/640/360",
-      title: "Map Search",
-      description: "Filtrez vos recherches par emplacements spécifiques avec notre interface de carte interactive."
+      image: "../../public/images/brand/image.png",
+      title: "Optimisez votre stratégie d'acquisition",
+      description: "Améliorez vos taux de conversion grâce à des contacts vérifiés et des données fiables pour votre prospection.",
+      demoUrl: "/personal-search"
     },
     {
       id: 4,
-      image: "/api/placeholder/640/360",
-      title: "Company Trace",
-      description: "Identifiez rapidement les emails valides pour n'importe quelle entreprise en utilisant le domaine."
+      image: "../../public/images/brand/image.png",
+      title: "Automatisez votre recherche de leads",
+      description: "Gagnez du temps précieux avec notre solution qui simplifie et accélère votre processus de prospection commerciale.",
+      demoUrl: "/personal-search"
     }
   ];
 
   // Fonction pour passer à l'image suivante
+  // Fonction pour passer à la diapositive suivante
   const nextSlide = () => {
-    setCurrentSlideIndex(prevIndex => 
-      prevIndex === carouselSlides.length - 1 ? 0 : prevIndex + 1
+    setCurrentSlideIndex((prevIndex) => 
+      prevIndex === carouselData.length - 1 ? 0 : prevIndex + 1
     );
   };
-
-  // Fonction pour revenir à l'image précédente
+  
+  // Fonction pour passer à la diapositive précédente
   const prevSlide = () => {
-    setCurrentSlideIndex(prevIndex => 
-      prevIndex === 0 ? carouselSlides.length - 1 : prevIndex - 1
+    setCurrentSlideIndex((prevIndex) => 
+      prevIndex === 0 ? carouselData.length - 1 : prevIndex - 1
     );
   };
-
-  // Fonction pour aller à une diapositive spécifique
+  
+  // Fonction pour aller directement à une diapositive spécifique
   const goToSlide = (index) => {
     setCurrentSlideIndex(index);
   };
-
-  // Défilement automatique
+  
+  // Rotation automatique des diapositives
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       nextSlide();
-    }, 5000); // Change toutes les 5 secondes
-
-    return () => clearInterval(interval);
-  }, [currentSlideIndex]);
+    }, 3000); // Change de diapositive toutes les 5 secondes
+    
+    // Nettoyer le timer lors du démontage du composant
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -91,7 +99,7 @@ export default function HomePage() {
                 >
                   Data
                 </span>
-                <span className="text-gray-700 font-semibold group-hover:text-gray-900 text-lg dark:text-gray-200"
+                <span className="text-gray-700 font-semibold group-hover:text-gray-900 text-lg "
                   style={{ fontSize: "2rem"  }}>
                   Pull
                 </span>
@@ -111,84 +119,90 @@ export default function HomePage() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <button className="px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100">Se connecter</button>
-            <button className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600" 
-            style={gradientStyle}>S'inscrire</button>
+            <button className="px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100"
+             onClick={() => navigate("/signin")}>Se connecter</button>
+            <button  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600" 
+            style={gradientStyle}
+            onClick={() => navigate("/signup")}>S'inscrire</button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-red-50 to-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-10 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Trouvez des emails professionnels en quelques clics</h1>
-              <p className="text-xl text-gray-600 mb-8">DataPull vous aide à découvrir des adresses email valides pour vos prospections B2B et votre développement commercial.</p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <button className="px-6 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center justify-center" style={gradientStyle}>
-                  Essayer gratuitement
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </button>
-                <button className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-100 flex items-center justify-center">
-                  Voir la démonstration
-                </button>
-              </div>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row items-center">
+          <div className="md:w-1/2 mb-10 md:mb-0">
+            {/* Texte synchronisé avec le carousel */}
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              {carouselData[currentSlideIndex].title}
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              {carouselData[currentSlideIndex].description}
+            </p>
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <button className="px-6 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 flex items-center justify-center" style={gradientStyle}>
+                Essayer gratuitement
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </button>
+              <button 
+                onClick={() => navigate(carouselData[currentSlideIndex].demoUrl)}
+                className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-100 flex items-center justify-center">
+                Voir la démonstration
+              </button>
             </div>
-            <div className="md:w-1/2">
-             {/* Nouveau Carousel */}
-             <div className="bg-white p-4 rounded-lg shadow-xl">
-                <div className="relative h-64 md:h-80 overflow-hidden rounded-md">
-                  {/* Image courante */}
-                  <img 
-                    src={carouselSlides[currentSlideIndex].image}
-                    alt={carouselSlides[currentSlideIndex].title}
-                    className="w-full h-full object-cover transition-all duration-500"
+          </div>
+          <div className="md:w-1/2 w-full">
+            {/* Carousel d'images */}
+            <div className="bg-white p-1 rounded-lg shadow-xl w-full">
+              <div className="relative h-64 md:h-96 w-full overflow-hidden rounded-md">
+                {/* Image courante */}
+                <img 
+                  src={carouselData[currentSlideIndex].image}
+                  alt={carouselData[currentSlideIndex].title}
+                  className="w-full h-full object-contain transition-all duration-500"
+                />
+                
+                {/* Overlay pour le texte */}
+                
+
+                {/* Boutons de navigation */}
+                <div className="absolute top-1/2 left-2 transform -translate-y-1/2">
+                  <button 
+                    onClick={prevSlide}
+                    className="p-1 bg-black/30 rounded-full backdrop-blur-sm text-white hover:bg-white/50 transition"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                </div>
+                
+                <div className="absolute top-1/2 right-2 transform -translate-y-1/2">
+                  <button 
+                    onClick={nextSlide}
+                    className="p-1 bg-black/30 rounded-full backdrop-blur-sm text-white hover:bg-white/50 transition"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Indicateurs de diapositive */}
+              <div className="flex justify-center space-x-2 mt-4">
+                {carouselData.map((slide, index) => (
+                  <button
+                    key={slide.id}
+                    onClick={() => goToSlide(index)}
+                    className={`h-2 rounded-full transition-all ${
+                      index === currentSlideIndex ? "w-8 bg-red-500" : "w-2 bg-gray-300"
+                    }`}
                   />
-                  
-                  {/* Overlay pour le texte */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                    <h3 className="text-xl font-bold mb-1">{carouselSlides[currentSlideIndex].title}</h3>
-                    <p className="text-sm">{carouselSlides[currentSlideIndex].description}</p>
-                  </div>
-
-                  {/* Boutons de navigation */}
-                  <div className="absolute top-1/2 left-2 transform -translate-y-1/2">
-                    <button 
-                      onClick={prevSlide}
-                      className="p-1 bg-white/30 rounded-full backdrop-blur-sm text-white hover:bg-white/50 transition"
-                    >
-                      <ChevronLeft className="h-6 w-6" />
-                    </button>
-                  </div>
-                  
-                  <div className="absolute top-1/2 right-2 transform -translate-y-1/2">
-                    <button 
-                      onClick={nextSlide}
-                      className="p-1 bg-white/30 rounded-full backdrop-blur-sm text-white hover:bg-white/50 transition"
-                    >
-                      <ChevronRight className="h-6 w-6" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Indicateurs de diapositive */}
-                <div className="flex justify-center space-x-2 mt-4">
-                  {carouselSlides.map((slide, index) => (
-                    <button
-                      key={slide.id}
-                      onClick={() => goToSlide(index)}
-                      className={`h-2 rounded-full transition-all ${
-                        index === currentSlideIndex ? "w-8 bg-red-500" : "w-2 bg-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Features Section */}
       <section id="features" className="py-20">
