@@ -109,6 +109,231 @@ const redIcon = createCustomIcon('#ff0000');
 const blueIcon = createCustomIcon('#2196F3');
 
 export function MapSearch() {
+
+  const [showDownloadOptions, setShowDownloadOptions] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  // Add these functions with your other callback functions
+  const downloadCurrentResults = () => {
+    if (results.length === 0) {
+      setError("No results to download.");
+      return;
+    }
+  
+    setIsDownloading(true);
+  
+    try {
+      // Create CSV headers
+      const headers = [
+        'First Name',
+        'Last Name',
+        'Gender',
+        'City',
+        'Country',
+        'Department',
+        'Region',
+        'Phone',
+        'Email',
+        'Workplace',
+        'Job Title',
+        'Relationship Status',
+        'Hometown City',
+        'Hometown Country',
+      ];
+  
+      // Format the results data
+      const csvData = results.map((user) => [
+        user.firstName || '',
+        user.lastName || '',
+        user.gender || '',
+        user.currentCity || '',
+        user.currentCountry || '',
+        user.currentDepartment || '',
+        user.currentRegion || '',
+        user.phoneNumber || '', // Phone
+        user.email || '', // Email
+        user.workplace || '',
+        user.jobTitle || '',
+        user.relationshipStatus || '', // Relationship
+        user.hometownCity || '',
+        user.hometownCountry || '',
+      ]);
+  
+      // Combine headers and data
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map((row) =>
+          row
+            .map((cell) =>
+              typeof cell === 'string' && cell.includes(',')
+                ? `"${cell.replace(/"/g, '""')}"`
+                : cell
+            )
+            .join(',')
+        ),
+      ].join('\n');
+  
+      // Create a Blob with the CSV content
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  
+      // Create a temporary link element to trigger the download
+      const link = document.createElement('a');
+      const fileName = `user-search-results-page${currentPage + 1}-${new Date()
+        .toISOString()
+        .slice(0, 10)}.csv`;
+  
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href); // Clean up
+    } catch (err) {
+      console.error('Download error:', err);
+      setError('An error occurred during download. Please try again.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+// Function to download all results (requires fetching all pages)
+const downloadAllResults = async () => {
+  if (nbr === 0) {
+    setError('No results to download.');
+    return;
+  }
+
+  setIsDownloading(true);
+
+  try {
+    const allData = [];
+    const totalPages = Math.ceil(nbr / resultsPerPage);
+
+    // Format the request based on the AdvancedSearchRequest class
+    const requestPayload = {
+      gender: searchParams.gender || null,
+      cities: selectedLocations.cities.size > 0 ? Array.from(selectedLocations.cities) : null,
+      departments: selectedLocations.departments.size > 0 ? Array.from(selectedLocations.departments) : null,
+      regions: selectedLocations.regions.size > 0 ? Array.from(selectedLocations.regions) : null,
+      size: resultsPerPage,
+      additionalAttributes: {},
+    };
+
+    // Fetch all pages
+    for (let page = 0; page < totalPages; page++) {
+      requestPayload.page = page;
+
+      const response = await axios.post(
+        'http://localhost:8080/users/search/advanced',
+        requestPayload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.data.content && response.data.content.length > 0) {
+        allData.push(...response.data.content);
+      }
+    }
+
+    if (allData.length === 0) {
+      setError('No data retrieved for download.');
+      setIsDownloading(false);
+      return;
+    }
+
+    // Create CSV headers
+    const headers = [
+      'First Name',
+      'Last Name',
+      'Gender',
+      'City',
+      'Country',
+      'Department',
+      'Region',
+      'Phone',
+      'Email',
+      'Workplace',
+      'Job Title',
+      'Relationship Status',
+      'Hometown City',
+      'Hometown Country',
+    ];
+
+    // Format all the data
+    const csvData = allData.map((user) => [
+      user.firstName || '',
+      user.lastName || '',
+      user.gender || '',
+      user.currentCity || '',
+      user.currentCountry || '',
+      user.currentDepartment || '',
+      user.currentRegion || '',
+      user.phoneNumber || '',  // Phone
+      user.email || '',  // Email
+      user.workplace || '',
+      user.jobTitle || '',
+      user.relationshipStatus || '', // Relationship
+      user.hometownCity || '',
+      user.hometownCountry || '',
+    ]);
+
+    // Combine headers and data
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map((row) =>
+        row
+          .map((cell) =>
+            typeof cell === 'string' && cell.includes(',')
+              ? `"${cell.replace(/"/g, '""')}"`
+              : cell
+          )
+          .join(',')
+      ),
+    ].join('\n');
+
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    // Create a temporary link element to trigger the download
+    const link = document.createElement('a');
+    const fileName = `all-user-search-results-${new Date().toISOString().slice(0, 10)}.csv`;
+
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href); // Clean up
+  } catch (err) {
+    console.error('Download error:', err);
+    setError('An error occurred while downloading all results. Please try again.');
+  } finally {
+    setIsDownloading(false);
+  }
+};
+
+// Add this effect with your other useEffect hooks
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (showDownloadOptions) {
+      const dropdown = document.querySelector('.dropdown-menu');
+      if (dropdown && !dropdown.contains(event.target)) {
+        setShowDownloadOptions(false);
+      }
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [showDownloadOptions]);
+
+
+
+
   const optionsG = [
     { value: "", label: "All" },
     { value: "Male", label: "Male" },
@@ -613,21 +838,97 @@ export function MapSearch() {
       </ComponentCard>
 
       <ComponentCard>
-        <CardHeader className="mb-8 p-6" style={gradientStyle}>
-          <div className="flex justify-between items-center">
-            <Typography variant="h5" color="white">
-              Search Results
-            </Typography>
-            <div className="flex items-center gap-2 text-sm text-white">
-              <span className="px-2 py-0.5 rounded-full bg-white text-red-500 font-bold shadow-sm">
-                {nbr} results
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-white text-red-500 font-bold shadow-sm">
-                {results.length} shown
-              </span>
+      <CardHeader className="mb-8 p-6" style={gradientStyle}>
+  <div className="flex justify-between items-center">
+    <Typography variant="h5" color="white">
+      Search Results
+    </Typography>
+    <div className="flex items-center gap-3">
+      <div className="relative">
+        <Button
+          size="sm"
+          className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+          onClick={() => setShowDownloadOptions(!showDownloadOptions)}
+          disabled={results.length === 0 || isLoading || isDownloading}
+        >
+          {isDownloading ? (
+            <>
+              <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
+              Downloading...
+            </>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
+              </svg>
+              Download
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </>
+          )}
+        </Button>
+
+        {showDownloadOptions && (
+          <div
+            className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-[1000] border border-gray-200"
+            onClick={(e) => e.stopPropagation()} // Prevent click inside from closing the dropdown
+          >
+            <div className="py-1">
+              <button
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                onClick={() => {
+                  downloadCurrentResults();
+                  setShowDownloadOptions(false);
+                }}
+                disabled={isDownloading}
+              >
+                Current Page ({results.length} results)
+              </button>
+              <button
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                onClick={() => {
+                  downloadAllResults();
+                  setShowDownloadOptions(false);
+                }}
+                disabled={isDownloading}
+              >
+                All Results ({nbr} results)
+              </button>
             </div>
           </div>
-        </CardHeader>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 text-sm text-white">
+        <span className="px-2 py-0.5 rounded-full bg-white text-red-500 font-bold shadow-sm">
+          {nbr} results
+        </span>
+        <span className="px-2 py-0.5 rounded-full bg-white text-red-500 font-bold shadow-sm">
+          {results.length} shown
+        </span>
+      </div>
+    </div>
+  </div>
+</CardHeader>
         <CardBody className=" px-0 pt-0 pb-2">
           {results.length > 0 ? (
              <div className="overflow-x-auto">
