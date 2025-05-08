@@ -34,7 +34,7 @@ const navItems = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/home", pro: false }],
+    subItems: [{ name: "Statistics", path: "/statistics", pro: false }],
   },
   {
     icon: <PhoneIcon />,

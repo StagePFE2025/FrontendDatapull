@@ -24,6 +24,7 @@ import CompanyTrace from "./pages/B2B/companyTrace";
 import GMail from "./pages/B2B/GMail";
 import Homepage from "./pages/homepage";
 import SearchStatistics from "./pages/phonora/SearchStatistics";
+import StatisticsDashboard from "./pages/Dashboard/StatisticsDashboard";
 export default function App() {
   return (
     <>
@@ -34,7 +35,7 @@ export default function App() {
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
             <Route index path="/home" element={<Home />} />
-            <Route path="/SearchStatistics" element={<SearchStatistics />} />
+            <Route path="/statistics" element={<StatisticsDashboard />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
