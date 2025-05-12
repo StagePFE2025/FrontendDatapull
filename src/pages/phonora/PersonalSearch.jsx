@@ -311,6 +311,60 @@ export function PersonalSearch() {
     return pages;
   }, [currentPage, totalPages]);
 
+  const [isDownloading, setIsDownloading] = useState(false);
+ const downloadAllResults = async () => {
+  if (nbr === 0) {
+    setError("Aucun résultat à télécharger.");
+    return;
+  }
+
+  setIsDownloading(true);
+  const filteredParams = Object.fromEntries(
+      Object.entries(searchParams).filter(([_, value]) => 
+        typeof value === 'string' && value.trim() !== ''
+      )
+    );
+
+  try {
+    // Préparer le payload : un simple objet clé-valeur (Map<String, String>)
+    const attributes = {
+      gender: searchParams.gender || "",
+      firstName: searchParams.firstName || "",
+      lastName: searchParams.lastName || "",
+      // Ajoute d'autres champs selon ce que tu veux envoyer au backend
+    };
+
+    const response = await fetch("http://localhost:8080/users/export-csvPS", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(filteredParams),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la génération du fichier CSV.");
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", `search-results-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Erreur téléchargement :", err);
+    setError("Une erreur est survenue pendant le téléchargement.");
+  } finally {
+    setIsDownloading(false);
+  }
+};
+
+
   const gradientStyle = { background: "linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)" };
   
   return (
@@ -338,7 +392,7 @@ export function PersonalSearch() {
         </div>
         
         <label className="text-center max-w-lg opacity-80 text-gray-800 dark:text-gray-200" style={{ fontSize: "1rem" }}>
-        Quickly find valid emails from any company
+        Quickly find Phone Number from any Person
         </label>
       </div>
       }
@@ -583,6 +637,44 @@ export function PersonalSearch() {
                 Clear
               </Button>
             </div>
+                        <div className="flex justify-between items-center mt-4 gap-20 justify-end">
+                          <div className="relative">
+                            <Button
+                              size="sm"
+                              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white mt-2"
+                              onClick={() => downloadAllResults()}
+                              disabled={results.length === 0 || isLoading || isDownloading}
+                            >
+                              {isDownloading ? (
+                                <>
+                                  <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
+                                  Downloading...
+                                </>
+                              ) : (
+                                <>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-5 h-5"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                                    />
+                                  </svg>
+                                  Download All Results
+                                </>
+                              )}
+                            </Button>
+            
+                            
+                          </div>
+                        </div>
+
 
             {error && <div className="text-red-500 mt-4">{error}</div>}
           </form>

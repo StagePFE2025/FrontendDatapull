@@ -25,6 +25,7 @@ import GMail from "./pages/B2B/GMail";
 import Homepage from "./pages/homepage";
 import SearchStatistics from "./pages/phonora/SearchStatistics";
 import StatisticsDashboard from "./pages/Dashboard/StatisticsDashboard";
+import FoodDeliveryPage from "./pages/B2B/B2BMap";
 export default function App() {
   return (
     <>
@@ -53,7 +54,8 @@ export default function App() {
              <Route path="/map-search" element={<MapSearch />} />
               {/* B2B */}
               <Route path="/company-trace" element={<CompanyTrace />} />
-             <Route path="/gMail" element={<GMail />} />
+              <Route path="/gMail" element={<GMail />} />
+              <Route path="/B2BMap" element={<FoodDeliveryPage />} />
 
             {/* Ui Elements */}
             <Route path="/alerts" element={<Alerts />} />

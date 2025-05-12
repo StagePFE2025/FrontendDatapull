@@ -50,6 +50,7 @@ const navItems = [
     subItems: [
       { icon: <UsersIcon />, name: "Ghost Mail Hunter", path: "/gMail", pro: false },
       { icon: <BriefcaseIcon />, name: "Company Trace", path: "/company-trace", pro: false },
+      { icon: <MapIcon />, name: "B2BMap", path: "/B2BMap", pro: false },
     ],
   },
   {

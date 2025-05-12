@@ -217,136 +217,66 @@ export function MapSearch() {
   };
 
   // Function to download all results (requires fetching all pages)
-  const downloadAllResults = async () => {
-    if (nbr === 0) {
-      setError("No results to download.");
-      return;
+const downloadAllResults = async () => {
+  if (nbr === 0) {
+    setError("Aucun résultat à télécharger.");
+    return;
+  }
+
+  setIsDownloading(true);
+
+  try {
+    const requestPayload = {
+      gender: searchParams.gender || null,
+      cities:
+        selectedLocations.cities.size > 0
+          ? Array.from(selectedLocations.cities)
+          : null,
+      departments:
+        selectedLocations.departments.size > 0
+          ? Array.from(selectedLocations.departments)
+          : null,
+      regions:
+        selectedLocations.regions.size > 0
+          ? Array.from(selectedLocations.regions)
+          : null,
+      additionalAttributes: {},
+    };
+
+    const response = await fetch("http://localhost:8080/users/export-csvMS", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestPayload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur lors du téléchargement.");
     }
 
-    setIsDownloading(true);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
 
-    try {
-      const allData = [];
-      const totalPages = Math.ceil(nbr / resultsPerPage);
+    const fileName = `all-user-search-results-${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
 
-      // Format the request based on the AdvancedSearchRequest class
-      const requestPayload = {
-        gender: searchParams.gender || null,
-        cities:
-          selectedLocations.cities.size > 0
-            ? Array.from(selectedLocations.cities)
-            : null,
-        departments:
-          selectedLocations.departments.size > 0
-            ? Array.from(selectedLocations.departments)
-            : null,
-        regions:
-          selectedLocations.regions.size > 0
-            ? Array.from(selectedLocations.regions)
-            : null,
-        size: resultsPerPage,
-        additionalAttributes: {},
-      };
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Erreur téléchargement :", err);
+    setError("Une erreur est survenue lors du téléchargement.");
+  } finally {
+    setIsDownloading(false);
+  }
+};
 
-      // Fetch all pages
-      for (let page = 0; page < totalPages; page++) {
-        requestPayload.page = page;
-
-        const response = await axios.post(
-          "http://localhost:8080/users/search/advanced",
-          requestPayload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (response.data.content && response.data.content.length > 0) {
-          allData.push(...response.data.content);
-        }
-      }
-
-      if (allData.length === 0) {
-        setError("No data retrieved for download.");
-        setIsDownloading(false);
-        return;
-      }
-
-      // Create CSV headers
-      const headers = [
-        "First Name",
-        "Last Name",
-        "Gender",
-        "City",
-        "Country",
-        "Department",
-        "Region",
-        "Phone",
-        "Email",
-        "Workplace",
-        "Job Title",
-        "Relationship Status",
-        "Hometown City",
-        "Hometown Country",
-      ];
-
-      // Format all the data
-      const csvData = allData.map((user) => [
-        user.firstName || "",
-        user.lastName || "",
-        user.gender || "",
-        user.currentCity || "",
-        user.currentCountry || "",
-        user.currentDepartment || "",
-        user.currentRegion || "",
-        user.phoneNumber || "", // Phone
-        user.email || "", // Email
-        user.workplace || "",
-        user.jobTitle || "",
-        user.relationshipStatus || "", // Relationship
-        user.hometownCity || "",
-        user.hometownCountry || "",
-      ]);
-
-      // Combine headers and data
-      const csvContent = [
-        headers.join(","),
-        ...csvData.map((row) =>
-          row
-            .map((cell) =>
-              typeof cell === "string" && cell.includes(",")
-                ? `"${cell.replace(/"/g, '""')}"`
-                : cell
-            )
-            .join(",")
-        ),
-      ].join("\n");
-
-      // Create a Blob with the CSV content
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
-      // Create a temporary link element to trigger the download
-      const link = document.createElement("a");
-      const fileName = `all-user-search-results-${new Date()
-        .toISOString()
-        .slice(0, 10)}.csv`;
-
-      link.href = URL.createObjectURL(blob);
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href); // Clean up
-    } catch (err) {
-      console.error("Download error:", err);
-      setError(
-        "An error occurred while downloading all results. Please try again."
-      );
-    } finally {
-      setIsDownloading(false);
-    }
-  };
 
   // Add this effect with your other useEffect hooks
   useEffect(() => {
@@ -789,7 +719,7 @@ export function MapSearch() {
               className="text-center max-w-lg opacity-80 text-gray-800 dark:text-gray-200"
               style={{ fontSize: "1rem" }}
             >
-              Quickly find valid emails from any company
+              Quickly find Phone Numbers from any Person in France
             </label>
           </div>
         }
