@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Star, Heart, MapPin, Clock, Sparkles } from "./Icons";
 import Badge from "./Badge";
 import Button from "./Button";
@@ -13,16 +13,97 @@ const RestaurantMapMarker = ({
   onClick,
   onFavoriteToggle,
   isDarkMode,
+  map,
 }) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [cardPosition, setCardPosition] = useState({ top: 0, left: 0 });
+  const cardRef = useRef(null);
+  
+  // Calcul optimisé de la position du hover card
+  useEffect(() => {
+    if (isHovered && !showPopup && map) {
+      const markerLatLng = [restaurant.lat, restaurant.lon];
+      const point = map.latLngToContainerPoint(markerLatLng);
+      
+      // Obtenir les dimensions de la carte pour éviter les débordements
+      const mapContainer = map.getContainer();
+      const mapWidth = mapContainer.offsetWidth;
+      const mapHeight = mapContainer.offsetHeight;
+      
+      // Dimensions estimées de la carte hover (si disponibles via ref)
+      const cardWidth = 300; // Valeur par défaut
+      const cardHeight = 350; // Valeur par défaut
+      
+      // Calculer la position optimale (éviter les bords)
+      let offsetX = -cardWidth / 2; // Centrer horizontalement par défaut
+      let offsetY = 40; // Placer sous le marqueur par défaut
+      
+      // Ajuster si trop à droite
+      if (point.x + offsetX + cardWidth > mapWidth - 20) {
+        offsetX = -cardWidth + 20;
+      }
+      
+      // Ajuster si trop à gauche
+      if (point.x + offsetX < 20) {
+        offsetX = -20;
+      }
+      
+      // Ajuster si trop bas - placer au-dessus du marqueur
+      if (point.y + offsetY + cardHeight > mapHeight - 20) {
+        offsetY = -cardHeight - 20;
+      }
+      
+      setCardPosition({
+        top: point.y + offsetY,
+        left: point.x + offsetX,
+      });
 
-  // Ce composant ne rend plus le marqueur lui-même, mais gère le hover et le popup
+      // Mettre à jour la position si la carte bouge
+      const updatePosition = () => {
+        const newPoint = map.latLngToContainerPoint(markerLatLng);
+        setCardPosition({
+          top: newPoint.y + offsetY,
+          left: newPoint.x + offsetX,
+        });
+      };
+
+      map.on("move", updatePosition);
+      map.on("zoom", updatePosition);
+
+      return () => {
+        map.off("move", updatePosition);
+        map.off("zoom", updatePosition);
+      };
+    }
+  }, [isHovered, showPopup, map, restaurant.lat, restaurant.lon]);
+
+  // Animation améliorée pour l'apparition et la disparition
+  const hoverCardClasses = `hover-card ${isDarkMode ? "dark" : ""} ${isHovered ? "visible" : "hidden"}`;
+
   return (
     <>
       {isHovered && !showPopup && (
-        <div className={`hover-card ${isDarkMode ? "dark" : ""}`} style={{ position: 'absolute', zIndex: 1000 }}>
+        <div
+          ref={cardRef}
+          className={hoverCardClasses}
+          style={{
+            position: "absolute",
+            zIndex: 1000,
+            top: `${cardPosition.top}px`,
+            left: `${cardPosition.left}px`,
+            transform: isHovered ? "translateY(0) scale(1)" : "translateY(10px) scale(0.95)",
+            opacity: isHovered ? 1 : 0,
+            pointerEvents: isHovered ? "auto" : "none",
+          }}
+          onMouseEnter={onHover}
+          onMouseLeave={onLeave}
+        >
           <div className="hover-card-image-container">
-            <img src={restaurant.image || "/placeholder.svg"} alt={restaurant.name} className="hover-card-image" />
+            <img
+              src={restaurant.image || "/placeholder.svg"}
+              alt={restaurant.name}
+              className="hover-card-image"
+            />
             <div className="hover-card-image-overlay"></div>
 
             <div className="hover-card-badge">
@@ -76,10 +157,16 @@ const RestaurantMapMarker = ({
 
             <div className="hover-card-details">
               <div className="hover-card-badges">
-                <Badge variant={isDarkMode ? "outline" : "secondary"} className="delivery-badge">
+                <Badge
+                  variant={isDarkMode ? "outline" : "secondary"}
+                  className="delivery-badge"
+                >
                   {restaurant.deliveryTime}
                 </Badge>
-                <Badge variant={isDarkMode ? "outline" : "secondary"} className="fee-badge">
+                <Badge
+                  variant={isDarkMode ? "outline" : "secondary"}
+                  className="fee-badge"
+                >
                   {restaurant.deliveryFee}
                 </Badge>
               </div>
@@ -95,10 +182,10 @@ const RestaurantMapMarker = ({
                   setShowPopup(true);
                 }}
               >
-                See Details
+                Voir détails
               </Button>
               <Button size="sm" className="order-button">
-                Order Now
+                Commander
               </Button>
             </div>
           </div>
