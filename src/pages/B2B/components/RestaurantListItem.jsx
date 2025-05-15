@@ -67,7 +67,7 @@ const RestaurantListItem = ({ restaurant, isHovered, isFavorite, onHover, onLeav
 
         <div className="thumbnail-container">
           <img
-            src={restaurant.thumbnail || "/placeholder.svg"}
+            src={restaurant.featuredImage || "/placeholder.svg"}
             alt={restaurant.name}
             className={`thumbnail ${isHovered ? "zoomed" : ""}`}
           />

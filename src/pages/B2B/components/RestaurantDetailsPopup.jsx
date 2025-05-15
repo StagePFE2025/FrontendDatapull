@@ -26,20 +26,17 @@ const RestaurantDetailsPopup = ({ restaurant, onClose, isFavorite, onFavoriteTog
       <div className={`restaurant-popup ${isDarkMode ? "dark" : ""}`}>
         <div className="popup-header">
           <img
-            src={restaurant.image || "/placeholder.svg"}
+            src={restaurant.featuredImage || "/placeholder.svg"}
             alt={restaurant.name}
             className="popup-image"
           />
           <div className="popup-image-overlay"></div>
-
           <button className="popup-close-button" onClick={onClose}>
             <X size={18} />
           </button>
-
           <button className="popup-favorite-button" onClick={onFavoriteToggle}>
             <Heart size={18} fill={isFavorite} className={isFavorite ? "text-red-500" : ""} />
           </button>
-
           <div className="popup-header-info">
             <h2 className="popup-title">{restaurant.name}</h2>
             <div className="popup-rating">
@@ -60,41 +57,28 @@ const RestaurantDetailsPopup = ({ restaurant, onClose, isFavorite, onFavoriteTog
             </div>
           </div>
         </div>
-
-        <div className="popup-content ">
+        <div className="popup-content">
           <div className="popup-options">
             {restaurant.dineIn && <Badge variant="outline">Repas sur place</Badge>}
             {restaurant.takeaway && <Badge variant="outline">Vente à emporter</Badge>}
             {restaurant.delivery && <Badge variant="outline">Livraison</Badge>}
           </div>
-
-          <div className="popup-actions">
-            <Button variant="link" size="sm">
-              Itinéraires
-            </Button>
-            <Button variant="link" size="sm">
-              Enregistrer
-            </Button>
-            <Button variant="link" size="sm">
-              Envoyer
-            </Button>
-            <Button variant="link" size="sm">
-              Partager
-            </Button>
+          <div className="popup-hours">
+            <Clock size={12} />
+            {Array.isArray(restaurant.hours) ? (
+              <ul>
+                {restaurant.hours.map((hour, index) => (
+                  <li key={index}>{`${hour.day}: ${hour.times}`}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>
+                {typeof restaurant.hours === "object" && restaurant.hours.times
+                  ? restaurant.hours.times
+                  : restaurant.hours || "Horaires non disponibles"}
+              </p>
+            )}
           </div>
-
-          <div className="popup-menu">
-            <Button variant="link" size="sm">
-              Menu
-            </Button>
-            <Button variant="link" size="sm">
-              Avis
-            </Button>
-            <Button variant="link" size="sm">
-              À propos
-            </Button>
-          </div>
-
           <Button className="close-button" onClick={onClose}>
             Close
           </Button>

@@ -6,154 +6,120 @@ import Button from "./components/Button";
 import RestaurantListItem from "./components/RestaurantListItem";
 import RestaurantMapMarker from "./components/RestaurantMapMarker";
 import Badge from "./components/Badge";
-import { searchRestaurants } from "./api"; // Importer le service API
-import RestaurantDetailsPopup from "./components/RestaurantDetailsPopup";
+import { searchRestaurants } from "./api";
 import "./style.css";
 
 const FoodDeliveryPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [city, setCity] = useState("Casablanca"); // Remplacer la location par city
-  const [category, setCategory] = useState(""); // Nouvelle état pour la catégorie
+  const [city, setCity] = useState("nimes");
+  const [category, setCategory] = useState("");
   const [hoveredRestaurant, setHoveredRestaurant] = useState(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-  const [showDetailsPopup, setShowDetailsPopup] = useState(false);
   const [mapZoom, setMapZoom] = useState(13);
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [favorites, setFavorites] = useState([1, 3]);
-  const [restaurants, setRestaurants] = useState([]); // État pour stocker les restaurants
-  const [totalResults, setTotalResults] = useState(0); // Nombre total de résultats
-  const [currentPage, setCurrentPage] = useState(0); // Page actuelle
-  const [pageSize, setPageSize] = useState(5); // Taille de la page
+  const [allRestaurants, setAllRestaurants] = useState([]); // For the list
+  const [restaurants, setRestaurants] = useState([]); // For the map
+  const [totalResults, setTotalResults] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
-  const markersRef = useRef({});
 
-  // Fonction pour effectuer une recherche
   const fetchRestaurants = async () => {
     try {
       setIsLoading(true);
-      
-      // Préparation des filtres à envoyer au backend
-      const filters = {
-        name: searchQuery,
-        city: city,
-        query: category, // La catégorie correspond au champ 'query' dans le backend
-      };
-      
-      // Appel de l'API avec pagination
+      const filters = { name: searchQuery, city, query: category };
       const result = await searchRestaurants(filters, currentPage, pageSize);
-      
-      // Mise à jour des états
-      setRestaurants(result.page.content);
-      setTotalResults(result.totalResults);
+      console.log("Raw API Response:", result);
+      if (result && result.page && Array.isArray(result.page.content)) {
+        const normalizedAllRestaurants = result.page.content.map(restaurant => ({
+          ...restaurant,
+          hours: Array.isArray(restaurant.hours)
+            ? restaurant.hours
+            : typeof restaurant.hours === "object" && restaurant.hours.times
+            ? restaurant.hours.times
+            : restaurant.hours || "Horaires non disponibles",
+        }));
+
+        const mapRestaurants = normalizedAllRestaurants.filter(restaurant =>
+          typeof restaurant.latitude === "number" &&
+          typeof restaurant.longitude === "number" &&
+          !isNaN(restaurant.latitude) &&
+          !isNaN(restaurant.longitude)
+        );
+
+        setAllRestaurants(normalizedAllRestaurants); // For the list
+        setRestaurants(mapRestaurants); // For the map
+        setTotalResults(result.totalResults || 0);
+        console.log("All Restaurants (for list):", normalizedAllRestaurants);
+        console.log("Map Restaurants (filtered):", mapRestaurants);
+        if (mapRestaurants.length < normalizedAllRestaurants.length) {
+          console.warn(
+            `${normalizedAllRestaurants.length - mapRestaurants.length} restaurants filtered out due to invalid coordinates`
+          );
+        }
+      } else {
+        console.error("Invalid API response format:", result);
+        setAllRestaurants([]);
+        setRestaurants([]);
+        setTotalResults(0);
+      }
       setIsLoading(false);
     } catch (error) {
-      console.error("Erreur lors de la récupération des restaurants:", error);
+      console.error("Error fetching restaurants:", error);
       setIsLoading(false);
+      setAllRestaurants([]);
+      setRestaurants([]);
+      setTotalResults(0);
     }
   };
 
-  // Effectuer une recherche lors du chargement initial et lorsque les filtres changent
   useEffect(() => {
     fetchRestaurants();
-  }, [currentPage, pageSize]); // Relancer la recherche quand la page change
+  }, []);
 
-  // Fonction pour effectuer une recherche manuelle (bouton ou touche Entrée)
   const handleSearch = () => {
-    setCurrentPage(0); // Réinitialiser à la première page lors d'une nouvelle recherche
+    setCurrentPage(0);
     fetchRestaurants();
   };
 
-  // Gestionnaire pour la touche Entrée dans le champ de recherche
+  useEffect(() => {
+    fetchRestaurants();
+  }, [currentPage, pageSize]);
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
 
-  // Gestionnaire pour le changement de page
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
 
-  // Gestionnaire pour le changement de taille de page
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
-    setCurrentPage(0); // Réinitialiser à la première page
+    setCurrentPage(0);
   };
 
-  // Calcul du nombre total de pages
+  const handleCityChange = (e) => {
+    setCity(e.target.value);
+  };
+
+  const clearCityField = () => {
+    setCity("");
+  };
+
   const totalPages = Math.ceil(totalResults / pageSize);
-
-  useEffect(() => {
-    if (restaurants.length > 0 && mapInstanceRef.current) {
-      // Mettre à jour les marqueurs sur la carte
-      // Nettoyer les marqueurs existants
-      Object.values(markersRef.current).forEach(marker => {
-        mapInstanceRef.current.removeLayer(marker);
-      });
-      markersRef.current = {};
-
-      // Ajouter les nouveaux marqueurs
-      restaurants.forEach((restaurant) => {
-        const marker = L.marker([restaurant.lat, restaurant.lon], {
-          icon: L.divIcon({
-            className: `map-marker ${favorites.includes(restaurant.id) ? "favorite" : ""} ${isDarkMode ? "dark" : ""} ${restaurant.isNew ? "new" : ""}`,
-            html: `<span className="marker-label">${restaurant.name[0]}</span>`,
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-          }),
-        }).addTo(mapInstanceRef.current);
-
-        markersRef.current[restaurant.id] = marker;
-
-        marker.on("mouseover", () => {
-          setHoveredRestaurant(restaurant);
-          marker.setIcon(
-            L.divIcon({
-              className: `map-marker hovered ${favorites.includes(restaurant.id) ? "favorite" : ""} ${isDarkMode ? "dark" : ""} ${restaurant.isNew ? "new" : ""}`,
-              html: `<span className="marker-label">${restaurant.name[0]}</span>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-            })
-          );
-        });
-
-        marker.on("mouseout", () => {
-          if (hoveredRestaurant?.id === restaurant.id) {
-            setHoveredRestaurant(null);
-          }
-          marker.setIcon(
-            L.divIcon({
-              className: `map-marker ${favorites.includes(restaurant.id) ? "favorite" : ""} ${isDarkMode ? "dark" : ""} ${restaurant.isNew ? "new" : ""}`,
-              html: `<span className="marker-label">${restaurant.name[0]}</span>`,
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-            })
-          );
-        });
-
-        marker.on("click", () => {
-          setSelectedRestaurant(restaurant);
-          setShowDetailsPopup(true);
-        });
-      });
-
-      // Ajuster la vue de la carte pour montrer tous les marqueurs
-      if (restaurants.length > 0) {
-        const bounds = L.latLngBounds(restaurants.map(r => [r.lat, r.lon]));
-        mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] });
-      }
-    }
-  }, [restaurants, isDarkMode, favorites, hoveredRestaurant]);
 
   useEffect(() => {
     if (!mapInstanceRef.current) {
       mapInstanceRef.current = L.map(mapRef.current, {
-        center: [33.5731, -7.5898], // Casablanca par défaut
+        center: [43.8367, 4.3601],
         zoom: mapZoom,
         zoomControl: false,
       });
@@ -173,22 +139,36 @@ const FoodDeliveryPage = () => {
     };
   }, [mapZoom]);
 
+  useEffect(() => {
+    if (restaurants.length > 0 && mapInstanceRef.current) {
+      const validCoordinates = restaurants
+        .filter(r => typeof r.latitude === "number" && typeof r.longitude === "number" && !isNaN(r.latitude) && !isNaN(r.longitude))
+        .map(r => [r.latitude, r.longitude]);
+      if (validCoordinates.length > 0) {
+        const bounds = L.latLngBounds(validCoordinates);
+        mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] });
+      } else {
+        mapInstanceRef.current.setView([43.8367, 4.3601], 13); // Fallback to Nîmes
+      }
+    }
+  }, [restaurants]);
+
   const handleZoomIn = () => setMapZoom((prev) => Math.min(prev + 1, 18));
   const handleZoomOut = () => setMapZoom((prev) => Math.max(prev - 1, 10));
 
   const toggleFilter = (filter) => {
-    // Si c'est une catégorie de cuisine, mettre à jour l'état category
     if (["American", "Italian", "Japanese", "Mexican"].includes(filter)) {
       if (category === filter) {
-        setCategory(""); // Désélectionner
+        setCategory("");
       } else {
-        setCategory(filter); // Sélectionner
+        setCategory(filter);
       }
+      handleSearch();
+    } else {
+      setActiveFilters((prev) =>
+        prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]
+      );
     }
-    
-    setActiveFilters((prev) =>
-      prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]
-    );
   };
 
   const toggleFavorite = (id) => {
@@ -197,10 +177,9 @@ const FoodDeliveryPage = () => {
     );
   };
 
-  const handleRestaurantClick = (restaurant) => {
-    setSelectedRestaurant(restaurant);
-    setShowDetailsPopup(true);
-  };
+const handleShowDetails = (restaurant) => {
+  setSelectedRestaurant(restaurant);
+};
 
   return (
     <div className={`map-container ${isDarkMode ? "dark" : ""}`}>
@@ -216,11 +195,7 @@ const FoodDeliveryPage = () => {
               placeholder="Rechercher par nom de restaurant"
               className={`search-input ${isDarkMode ? "dark" : ""}`}
             />
-            <Button 
-              className="search-button" 
-              onClick={handleSearch}
-              size="sm"
-            >
+            <Button className="search-button" onClick={handleSearch} size="sm">
               Rechercher
             </Button>
           </div>
@@ -233,16 +208,13 @@ const FoodDeliveryPage = () => {
               <input
                 type="text"
                 value={city}
-                onChange={(e) => setCity(e.target.value)}
+                onChange={handleCityChange}
                 onKeyPress={handleKeyPress}
                 placeholder="Ville"
                 className={`location-text-input ${isDarkMode ? "dark" : ""}`}
               />
             </div>
-            <button
-              onClick={() => setCity("")}
-              className={`clear-button ${isDarkMode ? "dark" : ""}`}
-            >
+            <button onClick={clearCityField} className={`clear-button ${isDarkMode ? "dark" : ""}`}>
               <X size={16} className={`clear-icon ${isDarkMode ? "dark" : ""}`} />
             </button>
           </div>
@@ -256,7 +228,6 @@ const FoodDeliveryPage = () => {
             <span>Filtres</span>
             <span className={`toggle-icon ${showFilters ? "open" : ""}`}>▼</span>
           </button>
-
           {showFilters && (
             <div className="filters-content">
               <div className="filter-section">
@@ -266,20 +237,14 @@ const FoodDeliveryPage = () => {
                     <Badge
                       key={cuisine}
                       variant={category === cuisine ? "default" : "outline"}
-                      className={`filter-badge ${
-                        category === cuisine ? "active" : ""
-                      } ${isDarkMode ? "dark" : ""}`}
-                      onClick={() => {
-                        setCategory(category === cuisine ? "" : cuisine);
-                        handleSearch(); // Lancer la recherche après changement
-                      }}
+                      className={`filter-badge ${category === cuisine ? "active" : ""} ${isDarkMode ? "dark" : ""}`}
+                      onClick={() => toggleFilter(cuisine)}
                     >
                       {cuisine}
                     </Badge>
                   ))}
                 </div>
               </div>
-
               <div className="filter-section">
                 <p className="filter-label">Prix</p>
                 <div className="filter-options">
@@ -287,9 +252,7 @@ const FoodDeliveryPage = () => {
                     <Badge
                       key={price}
                       variant={activeFilters.includes(price) ? "default" : "outline"}
-                      className={`filter-badge ${
-                        activeFilters.includes(price) ? "active" : ""
-                      } ${isDarkMode ? "dark" : ""}`}
+                      className={`filter-badge ${activeFilters.includes(price) ? "active" : ""} ${isDarkMode ? "dark" : ""}`}
                       onClick={() => toggleFilter(price)}
                     >
                       {price}
@@ -324,25 +287,23 @@ const FoodDeliveryPage = () => {
                     </div>
                   </div>
                 ))
-            : restaurants.map((restaurant) => (
+            : allRestaurants.length === 0
+            ? <div className="no-results">Aucun restaurant trouvé.</div>
+            : allRestaurants.map((restaurant) => (
                 <RestaurantListItem
                   key={restaurant.id}
                   restaurant={restaurant}
-                  isHovered={hoveredRestaurant?.id === restaurant.id}
                   isFavorite={favorites.includes(restaurant.id)}
-                  onHover={() => setHoveredRestaurant(restaurant)}
-                  onLeave={() => setHoveredRestaurant(null)}
-                  onClick={() => handleRestaurantClick(restaurant)}
                   onFavoriteToggle={() => toggleFavorite(restaurant.id)}
+                  onShowDetails={handleShowDetails}
                   isDarkMode={isDarkMode}
                 />
               ))}
         </div>
 
-        {/* Pagination */}
         <div className={`pagination-container ${isDarkMode ? "dark" : ""}`}>
           <div className="pagination-controls">
-            <Button 
+            <Button
               onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
               disabled={currentPage === 0}
               size="sm"
@@ -350,12 +311,10 @@ const FoodDeliveryPage = () => {
             >
               Précédent
             </Button>
-            
             <div className="pagination-info">
               Page {currentPage + 1} sur {totalPages || 1}
             </div>
-            
-            <Button 
+            <Button
               onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
               disabled={currentPage >= totalPages - 1}
               size="sm"
@@ -364,14 +323,9 @@ const FoodDeliveryPage = () => {
               Suivant
             </Button>
           </div>
-          
           <div className="page-size-selector">
             <span>Résultats par page:</span>
-            <select 
-              value={pageSize} 
-              onChange={handlePageSizeChange}
-              className={isDarkMode ? "dark" : ""}
-            >
+            <select value={pageSize} onChange={handlePageSizeChange} className={isDarkMode ? "dark" : ""}>
               <option value="5">5</option>
               <option value="10">10</option>
               <option value="20">20</option>
@@ -386,35 +340,43 @@ const FoodDeliveryPage = () => {
             ref={mapRef}
             className={`map-image-container ${isDarkMode ? "dark" : ""}`}
             style={{ height: "100%", width: "100%" }}
-          >
-            {/* Les marqueurs sont gérés dans useEffect */}
-          </div>
-
+          />
           <div className={`map-controls ${isDarkMode ? "dark" : ""}`}>
-            <button
-              className={`zoom-button ${isDarkMode ? "dark" : ""}`}
-              onClick={handleZoomIn}
-            >
+            <button className={`zoom-button ${isDarkMode ? "dark" : ""}`} onClick={handleZoomIn}>
               <Plus size={18} />
             </button>
-            <button
-              className={`zoom-button ${isDarkMode ? "dark" : ""}`}
-              onClick={handleZoomOut}
-            >
+            <button className={`zoom-button ${isDarkMode ? "dark" : ""}`} onClick={handleZoomOut}>
               <Minus size={18} />
             </button>
           </div>
+          {restaurants.map((restaurant) => (
+            <RestaurantMapMarker
+              key={restaurant.id}
+              restaurant={restaurant}
+              isHovered={hoveredRestaurant?.id === restaurant.id}
+              isFavorite={favorites.includes(restaurant.id)}
+              onHover={() => setHoveredRestaurant(restaurant)}
+              onLeave={() => setHoveredRestaurant(null)}
+              onShowDetails={handleShowDetails}
+              onFavoriteToggle={() => toggleFavorite(restaurant.id)}
+              isDarkMode={isDarkMode}
+              map={mapInstanceRef.current}
+            />
+          ))}
         </div>
       </div>
 
-      {showDetailsPopup && selectedRestaurant && (
-        <RestaurantDetailsPopup
-          restaurant={selectedRestaurant}
-          onClose={() => setShowDetailsPopup(false)}
-          isFavorite={favorites.includes(selectedRestaurant.id)}
-          onFavoriteToggle={() => toggleFavorite(selectedRestaurant.id)}
-          isDarkMode={isDarkMode}
-        />
+      {selectedRestaurant && (
+        <div className={`detail-overlay ${isDarkMode ? "dark" : ""}`} style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 1000, background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 0 10px rgba(0,0,0,0.5)" }}>
+          <h3>{selectedRestaurant.name}</h3>
+          <p>Rating: {selectedRestaurant.rating} ({selectedRestaurant.ratingCount})</p>
+          <p>Address: {selectedRestaurant.address}</p>
+          <p>Hours: {Array.isArray(selectedRestaurant.hours) ? selectedRestaurant.hours.map(h => `${h.day}: ${h.times}`).join(", ") : selectedRestaurant.hours}</p>
+          <p>Delivery Time: {selectedRestaurant.deliveryTime}</p>
+          <p>Delivery Fee: {selectedRestaurant.deliveryFee}</p>
+          <p>Price Range: {selectedRestaurant.priceRange}</p>
+          <Button onClick={() => setSelectedRestaurant(null)} size="sm">Fermer</Button>
+        </div>
       )}
     </div>
   );
