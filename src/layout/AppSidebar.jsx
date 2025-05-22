@@ -28,32 +28,71 @@ import {
   BriefcaseIcon,
   CircleStackIcon,
 } from "@heroicons/react/24/solid";
+import {
+  HomeIcon,
+  BuildingOfficeIcon,
+  UserGroupIcon,
+  EnvelopeIcon,
+  MagnifyingGlassIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/solid";
 import { useSidebar } from "../context/SidebarContext";
 
 const navItems = [
   {
     icon: <GridIcon />,
-    name: "Dashboard",
-    subItems: [{ name: "Statistics", path: "/statistics", pro: false }],
+    name: "Solutions Overview ",
+    path: "/home",
   },
   {
-    icon: <PhoneIcon />,
-    name: "Phonora",
+    icon: <UserGroupIcon />,
+    name: "B2C Solutions",
     subItems: [
-      { icon: <UsersIcon />, name: "Personal Search", path: "/personal-search", pro: false },
-      { icon: <MapPinIcon />, name: "Map Search", path: "/map-search", pro: false },
+      {
+        icon: <PhoneIcon />,
+        name: "Phonora Advanced Search",
+        path: "/personal-search",
+        pro: false,
+      },
+      {
+        icon: <MapPinIcon />,
+        name: "Phonora Map Search",
+        path: "/map-search",
+        pro: false,
+      },
+      {
+        icon: <ChartBarIcon />,
+        name: "Vizora",
+        path: "/statistics",
+        pro: false,
+      },
     ],
   },
   {
-    icon: <BriefcaseIcon />,
-    name: "B2B Search",
+    icon: <BuildingOfficeIcon />,
+    name: "B2B Solutions",
     subItems: [
-      { icon: <UsersIcon />, name: "Ghost Mail Hunter", path: "/gMail", pro: false },
-      { icon: <BriefcaseIcon />, name: "Company Trace", path: "/company-trace", pro: false },
-      { icon: <MapIcon />, name: "B2BMap", path: "/B2BMap", pro: false },
+      {
+        icon: <EnvelopeIcon />,
+        name: "Ghost Mail Hunter",
+        path: "/gMail",
+        pro: false,
+      },
+      {
+        icon: <MagnifyingGlassIcon />,
+        name: "Company Trace",
+        path: "/company-trace",
+        pro: false,
+      },
+      {
+        icon: <MapIcon />,
+        name: "MapSniffer",
+        path: "/B2BMap",
+        pro: false,
+      },
     ],
   },
-  {
+  /*{
     name: "Forms",
     icon: <ListIcon />,
     subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
@@ -71,7 +110,7 @@ const navItems = [
     icon: <TableIcon />,
     subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
   },
-  /*{
+  {
     icon: <CalenderIcon />,
     name: "Calendar",
     path: "/calendar",
@@ -278,9 +317,7 @@ const AppSidebar = () => {
                       }`}
                     >
                       {subItem.icon && (
-                        <span className="mr-2 w-5 h-5">
-                          {subItem.icon}
-                        </span>
+                        <span className="mr-2 w-5 h-5">{subItem.icon}</span>
                       )}
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
@@ -343,7 +380,10 @@ const AppSidebar = () => {
             variant="h1"
             className="flex items-center gap-2 transition duration-300 font-semibold text-xxl group"
           >
-            <div className="text-red-500 mr-2" style={{ color: "rgb(244, 84, 92)" }}>
+            <div
+              className="text-red-500 mr-2"
+              style={{ color: "rgb(244, 84, 92)" }}
+            >
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                 <rect width="40" height="8" rx="4" fill="currentColor" />
                 <rect y="16" width="40" height="8" rx="4" fill="currentColor" />
@@ -358,8 +398,10 @@ const AppSidebar = () => {
                 >
                   Data
                 </span>
-                <span className="text-gray-700 font-semibold group-hover:text-gray-900 text-lg dark:text-gray-200"
-                  style={{ fontSize: "2.5rem"  }}>
+                <span
+                  className="text-gray-700 font-semibold group-hover:text-gray-900 text-lg dark:text-gray-200"
+                  style={{ fontSize: "2.5rem" }}
+                >
                   Pull
                 </span>
 
@@ -368,8 +410,7 @@ const AppSidebar = () => {
                 </span>
               </span>
             ) : (
-              <span >
-              </span>
+              <span></span>
             )}
           </Typography>
         </Link>

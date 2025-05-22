@@ -33,12 +33,17 @@ export default function HomePage() {
 
   const carouselData = [
     {
+      id: 0,  // Add a new item at the beginning
+      image: "../../public/images/brand/solutions.png", // Use an appropriate image
+      title: "Voir toutes nos solutions",
+      description: "Découvrez notre page de solutions pour explorer toutes les fonctionnalités de DataPull.",
+      demoUrl: "/solutions",
       id: 1,
       image: "../../public/images/brand/pgh1.png",
       title: "Tableau de bord analytique des utilisateurs",
       description:
         "Visualisez en temps réel les statistiques démographiques et de localisation de votre base d’utilisateurs avec DataPull.",
-      demoUrl: "/statistics",
+      demoUrl: "/home",
     },
     {
       id: 2,
@@ -93,7 +98,9 @@ export default function HomePage() {
   const goToSlide = (index) => {
     setCurrentSlideIndex(index);
   };
-
+const goToSolutionsPage = () => {
+  navigate('/solutions');
+};
   // Rotation automatique des diapositives
   useEffect(() => {
     const timer = setInterval(() => {
@@ -208,9 +215,8 @@ export default function HomePage() {
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </button>
                 <button
-                  onClick={() =>
-                    navigate("/solutions")
-                  }
+                    onClick={() => navigate('/solutions')}
+
                   className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-100 flex items-center justify-center"
                 >
                   Voir la démonstration

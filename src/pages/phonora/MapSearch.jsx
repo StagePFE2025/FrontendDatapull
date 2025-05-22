@@ -50,6 +50,45 @@ const tooltipStyles = `
   }
 `;
 
+// Icônes pour le téléchargement
+const DownloadIcon = ({ size = 24, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7,10 12,15 17,10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
+const FileTextIcon = ({ size = 48, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M14,2 H6 A2,2 0 0,0 4,4 V20 A2,2 0 0,0 6,22 H18 A2,2 0 0,0 20,20 V8 Z" />
+    <polyline points="14,2 14,8 20,8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <polyline points="10,9 9,9 8,9" />
+  </svg>
+);
+
 // Reused ProtectedData component
 const ProtectedData = ({ dataId, type }) => {
   const [isRevealed, setIsRevealed] = useState(false);
@@ -75,7 +114,7 @@ const ProtectedData = ({ dataId, type }) => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `http://localhost:8080/users/protectedData/${dataId}?type=${type}`
+        `http://51.44.136.165:8080/users/protectedData/${dataId}?type=${type}`
       );
       const responseData = response.data.value;
       dataCache.set(cacheKey, responseData);
@@ -122,7 +161,7 @@ const createCustomIcon = (color) => {
     iconSize: [16, 16],
     iconAnchor: [8, 8],
     popupAnchor: [0, -8],
-    tooltipAnchor: [0, -5], // Position for tooltips
+    tooltipAnchor: [0, -5],
   });
 };
 
@@ -133,16 +172,101 @@ const blueIcon = createCustomIcon("#2196F3");
 export function MapSearch() {
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  // Add these functions with your other callback functions
-  const downloadCurrentResults = () => {
+  
+  // Nouveaux états pour la progression du téléchargement
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadError, setDownloadError] = useState(null);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadType, setDownloadType] = useState(''); // 'current' ou 'all'
+
+  // Modal de progression de téléchargement
+  const DownloadProgressModal = () => {
+    if (!showDownloadModal) return null;
+
+    return (
+      <div className="fixed inset-0  backdrop-blur-sm flex items-center justify-center z-[5000]" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div className={`bg-white rounded-lg p-20 max-w-xl w-full mx-4`}>
+          <div className="text-center">
+            <div className="mb-4">
+              <FileTextIcon size={48} className="mx-auto mb-2 text-blue-500" />
+              <h3 className="text-lg font-semibold">
+                {downloadSuccess ? 'Téléchargement terminé!' : 'Téléchargement en cours...'}
+              </h3>
+            </div>
+
+            {downloadError ? (
+              <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded text-red-700 text-sm">
+                Erreur: {downloadError}
+              </div>
+            ) : downloadSuccess ? (
+              <div className="mb-4 p-3 bg-green-100 border border-green-300 rounded text-green-700 text-sm">
+                Fichier CSV téléchargé avec succès!
+              </div>
+            ) : (
+              <div className="mb-4">
+                <div className="text-sm text-gray-600 mb-2">
+                  Progression: {downloadProgress}%
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${downloadProgress}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {downloadProgress < 30 ? 'Préparation des données...' :
+                   downloadProgress < 70 ? 'Génération du fichier CSV...' :
+                   downloadProgress < 100 ? 'Finalisation...' : 'Terminé!'}
+                </div>
+                <div className="text-xs text-gray-400 mt-2">
+                  Type: {downloadType === 'current' ? 'Page actuelle' : 'Tous les résultats'}
+                </div>
+              </div>
+            )}
+
+            {!isDownloading && (
+              <button
+                onClick={closeDownloadModal}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                Fermer
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Fonction pour fermer la modal
+  const closeDownloadModal = () => {
+    if (!isDownloading) {
+      setShowDownloadModal(false);
+      setDownloadProgress(0);
+      setDownloadError(null);
+      setDownloadSuccess(false);
+      setDownloadType('');
+    }
+  };
+
+  // Fonction améliorée pour télécharger la page actuelle
+  const downloadCurrentResults = async () => {
     if (results.length === 0) {
       setError("No results to download.");
       return;
     }
 
     setIsDownloading(true);
+    setDownloadProgress(0);
+    setDownloadError(null);
+    setDownloadSuccess(false);
+    setShowDownloadModal(true);
+    setDownloadType('current');
 
     try {
+      setDownloadProgress(20);
+
       // Create CSV headers
       const headers = [
         "First Name",
@@ -161,6 +285,8 @@ export function MapSearch() {
         "Hometown Country",
       ];
 
+      setDownloadProgress(40);
+
       // Format the results data
       const csvData = results.map((user) => [
         user.firstName || "",
@@ -170,14 +296,16 @@ export function MapSearch() {
         user.currentCountry || "",
         user.currentDepartment || "",
         user.currentRegion || "",
-        user.phoneNumber || "", // Phone
-        user.email || "", // Email
+        user.phoneNumber || "",
+        user.email || "",
         user.workplace || "",
         user.jobTitle || "",
-        user.relationshipStatus || "", // Relationship
+        user.relationshipStatus || "",
         user.hometownCity || "",
         user.hometownCountry || "",
       ]);
+
+      setDownloadProgress(70);
 
       // Combine headers and data
       const csvContent = [
@@ -193,6 +321,8 @@ export function MapSearch() {
         ),
       ].join("\n");
 
+      setDownloadProgress(90);
+
       // Create a Blob with the CSV content
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
@@ -207,76 +337,106 @@ export function MapSearch() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(link.href); // Clean up
+      URL.revokeObjectURL(link.href);
+
+      setDownloadProgress(100);
+      setDownloadSuccess(true);
+
+      // Fermer la modal après 2 secondes
+      setTimeout(() => {
+        closeDownloadModal();
+      }, 2000);
+
     } catch (err) {
       console.error("Download error:", err);
-      setError("An error occurred during download. Please try again.");
+      setDownloadError("Une erreur est survenue lors du téléchargement. Veuillez réessayer.");
     } finally {
       setIsDownloading(false);
     }
   };
 
-  // Function to download all results (requires fetching all pages)
-const downloadAllResults = async () => {
-  if (nbr === 0) {
-    setError("Aucun résultat à télécharger.");
-    return;
-  }
-
-  setIsDownloading(true);
-
-  try {
-    const requestPayload = {
-      gender: searchParams.gender || null,
-      cities:
-        selectedLocations.cities.size > 0
-          ? Array.from(selectedLocations.cities)
-          : null,
-      departments:
-        selectedLocations.departments.size > 0
-          ? Array.from(selectedLocations.departments)
-          : null,
-      regions:
-        selectedLocations.regions.size > 0
-          ? Array.from(selectedLocations.regions)
-          : null,
-      additionalAttributes: {},
-    };
-
-    const response = await fetch("http://localhost:8080/users/export-csvMS", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestPayload),
-    });
-
-    if (!response.ok) {
-      throw new Error("Erreur lors du téléchargement.");
+  // Fonction améliorée pour télécharger tous les résultats
+  const downloadAllResults = async () => {
+    if (nbr === 0) {
+      setError("Aucun résultat à télécharger.");
+      return;
     }
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    setIsDownloading(true);
+    setDownloadProgress(0);
+    setDownloadError(null);
+    setDownloadSuccess(false);
+    setShowDownloadModal(true);
+    setDownloadType('all');
 
-    const fileName = `all-user-search-results-${new Date()
-      .toISOString()
-      .slice(0, 10)}.csv`;
+    try {
+      setDownloadProgress(10);
 
-    link.href = url;
-    link.setAttribute("download", fileName);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-  } catch (err) {
-    console.error("Erreur téléchargement :", err);
-    setError("Une erreur est survenue lors du téléchargement.");
-  } finally {
-    setIsDownloading(false);
-  }
-};
+      const requestPayload = {
+        gender: searchParams.gender || null,
+        cities:
+          selectedLocations.cities.size > 0
+            ? Array.from(selectedLocations.cities)
+            : null,
+        departments:
+          selectedLocations.departments.size > 0
+            ? Array.from(selectedLocations.departments)
+            : null,
+        regions:
+          selectedLocations.regions.size > 0
+            ? Array.from(selectedLocations.regions)
+            : null,
+        additionalAttributes: {},
+      };
 
+      setDownloadProgress(30);
+
+      const response = await fetch("http://51.44.136.165:8080/users/export-csvMS", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestPayload),
+      });
+
+      setDownloadProgress(60);
+
+      if (!response.ok) {
+        throw new Error("Erreur lors du téléchargement.");
+      }
+
+      setDownloadProgress(80);
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      const fileName = `all-user-search-results-${new Date()
+        .toISOString()
+        .slice(0, 10)}.csv`;
+
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      setDownloadProgress(100);
+      setDownloadSuccess(true);
+
+      // Fermer la modal après 2 secondes
+      setTimeout(() => {
+        closeDownloadModal();
+      }, 2000);
+
+    } catch (err) {
+      console.error("Erreur téléchargement :", err);
+      setDownloadError("Une erreur est survenue lors du téléchargement.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   // Add this effect with your other useEffect hooks
   useEffect(() => {
@@ -318,7 +478,7 @@ const downloadAllResults = async () => {
   const [error, setError] = useState(null);
   const [regionsData, setRegionsData] = useState(null);
   const [departmentsData, setDepartmentsData] = useState(null);
-  const [showLayerGuide, setShowLayerGuide] = useState(true); // State for arrow/message visibility
+  const [showLayerGuide, setShowLayerGuide] = useState(true);
 
   // Fetch city data from geo.api.gouv.fr
   useEffect(() => {
@@ -327,13 +487,12 @@ const downloadAllResults = async () => {
         const response = await axios.get(
           "https://geo.api.gouv.fr/communes?fields=nom,codesPostaux,centre,population&boost=population"
         );
-        // Filter cities with population > 20,000
         const filteredCities = response.data
           .filter((city) => city.population > 20000 && city.centre?.coordinates)
           .map((city) => ({
             name: city.nom,
             country: "France",
-            position: [city.centre.coordinates[1], city.centre.coordinates[0]], // [lat, lon]
+            position: [city.centre.coordinates[1], city.centre.coordinates[0]],
             population: city.population,
           }));
         setCities(filteredCities);
@@ -381,7 +540,6 @@ const downloadAllResults = async () => {
     setIsLoading(true);
     setError(null);
 
-    // Format the request based on the AdvancedSearchRequest class
     const requestPayload = {
       gender: searchParams.gender || null,
       cities:
@@ -398,12 +556,12 @@ const downloadAllResults = async () => {
           : null,
       page: currentPage,
       size: resultsPerPage,
-      additionalAttributes: {}, // Empty for now, can be extended if needed
+      additionalAttributes: {},
     };
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/users/search/advanced",
+        "http://51.44.136.165:8080/users/search/advanced",
         requestPayload,
         {
           headers: {
@@ -412,11 +570,9 @@ const downloadAllResults = async () => {
         }
       );
 
-      // Process the response based on the expected structure
       setResults(response.data.content || []);
       setNBR(response.data.totalItems || 0);
 
-      // Update currentPage if it came back different than what we requested
       if (response.data.currentPage !== undefined) {
         setCurrentPage(response.data.currentPage);
       }
@@ -542,14 +698,12 @@ const downloadAllResults = async () => {
     (feature, layer) => {
       const name = feature.properties.nom;
 
-      // Add tooltip to show name on hover
       layer.bindTooltip(name, {
         permanent: false,
         direction: "center",
         className: "leaflet-tooltip-custom",
       });
 
-      // Keep popup for click
       layer.bindPopup(name);
 
       layer.on({
@@ -563,14 +717,12 @@ const downloadAllResults = async () => {
     (feature, layer) => {
       const name = feature.properties.nom;
 
-      // Add tooltip to show name on hover
       layer.bindTooltip(name, {
         permanent: false,
         direction: "center",
         className: "leaflet-tooltip-custom",
       });
 
-      // Keep popup for click
       layer.bindPopup(name);
 
       layer.on({
@@ -615,7 +767,6 @@ const downloadAllResults = async () => {
             {user.currentCountry}
           </Typography>
         </td>
-
         <td className="py-3 px-5">
           <Typography className="text-xs font-semibold text-blue-gray-600 dark:text-gray-100">
             {user.currentDepartment}
@@ -661,10 +812,10 @@ const downloadAllResults = async () => {
     ));
   }, [results]);
 
-  //const gradientStyle = { background: "linear-gradient(135deg, #b24592 0%, #f15f79 100%)" };
   const gradientStyle = {
     background: "linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)",
   };
+
   // Add style tag to inject tooltip styles
   useEffect(() => {
     const styleElement = document.createElement("style");
@@ -678,11 +829,13 @@ const downloadAllResults = async () => {
 
   return (
     <div className="mt-2 mb-2 flex flex-col gap-12">
+      {/* Modal de progression */}
+      <DownloadProgressModal />
+
       <ComponentCard
         title={
           <div className="flex flex-col items-center justify-center mb-4 mt-4">
             <div className="flex items-center mb-4">
-              {/* Logo de la marque */}
               <div
                 className="p-3 rounded-lg shadow-lg mr-4"
                 style={gradientStyle}
@@ -691,19 +844,17 @@ const downloadAllResults = async () => {
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                   stroke="currentColor"
                   className="h-10 w-10 text-white"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"
                   />
                 </svg>
               </div>
-
-              {/* Titre de l'application */}
               <div>
                 <label
                   className="font-bold mb-0 text-gray-800 dark:text-gray-200"
@@ -892,63 +1043,65 @@ const downloadAllResults = async () => {
             </div>
             <div className="flex justify-between items-center mt-4 gap-20 justify-end">
               <div className="relative">
-                <Button
-                  size="sm"
-                  className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white mt-2"
-                  onClick={() => downloadAllResults()}
-                  disabled={results.length === 0 || isLoading || isDownloading}
-                >
-                  {isDownloading ? (
-                    <>
-                      <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
-                      Downloading...
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                        />
-                      </svg>
-                      Download All Results
-                    </>
-                  )}
-                </Button>
+                {/* Bouton de téléchargement avec dropdown */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+                    onClick={() => setShowDownloadOptions(!showDownloadOptions)}
+                    disabled={results.length === 0 || isLoading || isDownloading}
+                  >
+                    {isDownloading ? (
+                      <>
+                        <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
+                        Téléchargement...
+                      </>
+                    ) : (
+                      <>
+                        <DownloadIcon size={16} />
+                        Télécharger CSV
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </>
+                    )}
+                  </Button>
+                </div>
 
                 {showDownloadOptions && (
                   <div
-                    className="absolut right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-[1000] border border-gray-200"
-                    onClick={(e) => e.stopPropagation()} // Prevent click inside from closing the dropdown
+                    className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-[1000] border border-gray-200 dropdown-menu"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <div className="py-1">
                       <button
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center justify-between"
                         onClick={() => {
                           downloadCurrentResults();
                           setShowDownloadOptions(false);
                         }}
                         disabled={isDownloading}
                       >
-                        Current Page ({results.length} results)
+                        <div>
+                          <div className="font-medium">Page actuelle</div>
+                          <div className="text-xs text-gray-500">{results.length} résultats</div>
+                        </div>
+                        <DownloadIcon size={14} />
                       </button>
+                      <hr className="border-gray-200" />
                       <button
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 flex items-center justify-between"
                         onClick={() => {
                           downloadAllResults();
                           setShowDownloadOptions(false);
                         }}
                         disabled={isDownloading}
                       >
-                        All Results ({nbr} results)
+                        <div>
+                          <div className="font-medium">Tous les résultats</div>
+                          <div className="text-xs text-gray-500">{nbr} résultats au total</div>
+                        </div>
+                        <DownloadIcon size={14} />
                       </button>
                     </div>
                   </div>
@@ -975,6 +1128,17 @@ const downloadAllResults = async () => {
                   {results.length} shown
                 </span>
               </div>
+              {/* Bouton d'export rapide dans le header 
+              <button
+                onClick={() => downloadAllResults()}
+                disabled={results.length === 0 || isLoading || isDownloading}
+                className="flex items-center gap-1 px-3 py-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 rounded-full text-white text-sm font-medium transition-colors"
+                title="Télécharger tous les résultats en CSV"
+              >
+                <DownloadIcon size={14} />
+                Export CSV
+              </button>
+              */}
             </div>
           </div>
         </CardHeader>

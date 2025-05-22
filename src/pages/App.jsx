@@ -26,7 +26,7 @@ import HomePage from "./pages/homepage";
 import Home from "./pages/home";
 import SearchStatistics from "./pages/phonora/SearchStatistics";
 import StatisticsDashboard from "./pages/Dashboard/StatisticsDashboard";
-import MapSmiffer from "./pages/B2B/B2BMap";
+import FoodDeliveryPage from "./pages/B2B/B2BMap";
 import HomepageSolutions from "./pages/home";
 export default function App() {
   return (
@@ -60,7 +60,7 @@ export default function App() {
               {/* B2B */}
               <Route path="/company-trace" element={<CompanyTrace />} />
               <Route path="/gMail" element={<GMail />} />
-              <Route path="/B2BMap" element={<MapSmiffer />} />
+              <Route path="/B2BMap" element={<FoodDeliveryPage />} />
 
             {/* Ui Elements */}
             <Route path="/alerts" element={<Alerts />} />

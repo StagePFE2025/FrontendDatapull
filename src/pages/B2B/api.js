@@ -1,5 +1,5 @@
 // services/api.js
-const API_BASE_URL = "http://localhost:8080/api/repair-shops"; // Ajustez selon votre configuration
+const API_BASE_URL = "http://51.44.136.165:8080/api/repair-shops"; // Ajustez selon votre configuration
 
 export const searchRestaurants = async (filters, page = 0, size = 10, sortBy = "_score", direction = "desc") => {
   try {

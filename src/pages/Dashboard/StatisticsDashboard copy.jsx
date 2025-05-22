@@ -50,7 +50,7 @@ export default function StatisticsDashboard() {
   const fetchData = async (endpoint) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/statistics/${endpoint}`
+        `http://51.44.136.165:8080/api/statistics/${endpoint}`
       );
       if (!response.ok) {
         throw new Error(
@@ -71,7 +71,7 @@ export default function StatisticsDashboard() {
 
   const getUserCount = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/users/countUsers');
+      const response = await axios.get('http://51.44.136.165:8080/users/countUsers');
       return response.data;
     } catch (error) {
       console.error('Erreur dans getUserCount :', error.message);
