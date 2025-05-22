@@ -137,6 +137,7 @@ const navItems = [
 ];
 
 const othersItems = [
+  
   {
     icon: <PieChartIcon />,
     name: "Charts",
@@ -434,7 +435,7 @@ const AppSidebar = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            <div className="">
+            {/*<div className="">
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
                   !isExpanded && !isHovered
@@ -449,7 +450,7 @@ const AppSidebar = () => {
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}
-            </div>
+            </div>*/}
           </div>
         </nav>
       </div>
